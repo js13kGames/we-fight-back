@@ -18,28 +18,23 @@ function createTCVS() {
 }
 
 
-
-
 //draw text
 //canvas is not cleared, and fillstyle not set!
 function drawText(string, scl, pos, rAlign ) {
     if (!rAlign){
-        var rAlign = false
+        var rAlign = false;
     }
-    var scl = scl
-    var context = TCTX
-    var canvas = TCVS
-    var size = 5 * scl
-    var TX = pos.x
-    var TY = pos.y
-
-
+    const context = TCTX;
+    const canvas = TCVS;
+    const size = 5 * scl;
+    const TX = pos.x;
+    const TY = pos.y;
 
     var needed = [];
     if (string) {
         string = string.toUpperCase();
-        for (var i = 0; i < string.length; i++) {
-            var letter = letters[string.charAt(i)];
+        for (let i = 0; i < string.length; i++) {
+            const letter = letters[string.charAt(i)];
             if (letter) {
                 needed.push(letter);
             }
@@ -47,13 +42,13 @@ function drawText(string, scl, pos, rAlign ) {
 
         if (rAlign == false) {
             var currX = 0;
-            for (i = 0; i < needed.length; i++) {
+            for (let i = 0; i < needed.length; i++) {
                 letter = needed[i];
                 var currY = 0;
                 var addX = 0;
-                for (var y = 0; y < letter.length; y++) {
+                for (let y = 0; y < letter.length; y++) {
                     var row = letter[y];
-                    for (var x = 0; x < row.length; x++) {
+                    for (let x = 0; x < row.length; x++) {
                         if (row[x]) {
                             context.fillRect(currX + x * size + TX, currY + TY, size, size);
                         }
@@ -63,7 +58,7 @@ function drawText(string, scl, pos, rAlign ) {
                 }
                 currX += size + addX;
             }
-        }else{
+        } else {
             var currX = 0;
             for (i = 0; i < needed.length; i++) {
                 letter = needed[needed.length-i-1];
@@ -82,7 +77,6 @@ function drawText(string, scl, pos, rAlign ) {
                 currX -= size + addX;
             }
         }
-
     }
 }
 
@@ -90,7 +84,7 @@ function drawText(string, scl, pos, rAlign ) {
 
 
 //I use Pixel Font letters, but I also added some additional letters that I needed
-var letters = {
+const letters = {
     'A': [
         [, 1],
         [1, , 1],
