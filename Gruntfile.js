@@ -104,17 +104,16 @@ module.exports = function (grunt) {
     fs.stat('dist/game.zip', function(err, zip) {
       if (zip.size > 13312) {
         // If size in bytes greater than 13kb
-        grunt.log.error("Zipped file greater than 13kb \x07 \n");
-        grunt.log.error("WARNING! FILESIZE IS TOO BIG!");
-        grunt.log.error("Zip is " + zip.size + " bytes when js13k max is 13,312 bytes");
+        grunt.log.error('Zipped file greater than 13kb \x07 \n');
+        grunt.log.error('WARNING! FILESIZE IS TOO BIG!');
+        grunt.log.error(`Zip is ${zip.size} bytes when js13k max is 13,312 bytes`);
       } else {
-        grunt.log.error("Zip is " + zip.size + " bytes!");
-        grunt.log.error("Filesize OK!");
+        grunt.log.error(`Zip is ${zip.size} bytes!`);
+        grunt.log.error('Filesize OK!');
       }
       done();
     });
   });
-  grunt.loadNpmTasks('grunt-closure-compiler');
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-contrib-uglify-es');
   grunt.loadNpmTasks('grunt-processhtml');
