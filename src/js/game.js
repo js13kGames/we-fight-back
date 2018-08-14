@@ -1,16 +1,15 @@
 /*
-A DAY IN THE LIFE
-by Mattia Fortunati
+AS OF YET UNNAMED
+by Christian Paul
 
-http://www.mattiafortunati.com
-mattia@mattiafortunati.com
+http://chrpaul.de
 
-A DAY IN THE LIFE was developed for the 2017 js13kGames competition.
+AS OF YET UNNAMED was developed for the js13kGames 2018 competition.
 http://js13kgames.com/
 
 -
 
-Libs used: 
+Libs used:
 -Kontra (used for game loop and assets preloading) https://straker.github.io/kontra/
 -TinyMusic (as is) https://github.com/kevincennis/TinyMusic
 -Pixel Font (adapted) https://github.com/PaulBGD/PixelFont
@@ -20,13 +19,6 @@ https://github.com/xem/responsiveTouchGameFramework/blob/gh-pages/mini.html
 
 -
 
-Note that the code is far, far away, from being optimized at best.
-There are a lot of possible optimization to make it smaller, faster and improve overall performance.
-But, this was really the best I could do with the short time I had for working on it!
-
-Where code comments are not enough, I've left long and readable variable and function names.
-I hope that you will find this source code useful somehow! :)
-
 I hope that you'll like my game.
 Thank you for playing!
 
@@ -34,7 +26,7 @@ Thank you for playing!
 
 
 
-/* 
+/*
 =======================================================
 INIT KONTRA ENGINE
 =======================================================
@@ -43,21 +35,21 @@ kontra.init()
 
 
 
-/* 
+/*
 =======================================================
 handle window lost focus
 =======================================================
 */
-blurred = false
+let blurred = false;
 window.onblur = function() {
-    sequence1.gain.gain.value = 0
-    sequence2.gain.gain.value = 0
-    blurred = true
+    sequence1.gain.gain.value = 0;
+    sequence2.gain.gain.value = 0;
+    blurred = true;
 }
 
 
 
-/* 
+/*
 =======================================================
 ONE TIME VAR INITIALIZATION
 =======================================================
@@ -77,7 +69,7 @@ const white = '#fff';
 
 var POOL;
 
-/* 
+/*
 =======================================================
 PRE-LOADING ASSETS
 then start the game
@@ -99,7 +91,7 @@ kontra.assets.load(img_boy,)
     });
 
 
-/* 
+/*
 =======================================================
 CLASS POOL
 =======================================================
@@ -125,7 +117,7 @@ class Pool {
 }
 
 
-/* 
+/*
 =======================================================
 MAIN GAME OBJECT
 =======================================================
@@ -153,7 +145,7 @@ obj = function() {
         // this.remove to end it.
         if (this.flaggedRemove == false && this.isActive == true) {
             if (this.type == 'boy') {
-                
+
             }
         }
     },
@@ -190,7 +182,7 @@ obj = function() {
 
 
 
-/* 
+/*
 =======================================================
 Mouse and touch handling
 =======================================================
@@ -217,7 +209,7 @@ b.addEventListener("mousedown", function(e) {
 }, false);
 
 
-/* 
+/*
 =======================================================
 MISC functions
 =======================================================
@@ -243,7 +235,7 @@ initializeGame = function() {
     POOL = new Pool();
     player = POOL.getFromPool();
     player.create(0, 0, img_boy, 'boy');
-    
+
     startGame();
 }
 
@@ -294,7 +286,7 @@ restart = function() {
     initializeGame();
 }
 
-/* 
+/*
 =======================================================
 Object Creation
 =======================================================
@@ -309,7 +301,7 @@ createBoy = function() {
     u.groundType = Math.floor(Math.random() * 3);
 }
 
-/* 
+/*
 =======================================================
 Top UI
 =======================================================
@@ -320,7 +312,7 @@ drawUI = function() {
 }
 
 
-/* 
+/*
 =======================================================
 GAME LOOP
 =======================================================
@@ -331,13 +323,13 @@ startLoop = function() {
         update: function() {
 
             if (gamePhase === 1) {
-                
+
             }
         },
         render: function() {
             x.fillStyle = white;
             x.fillRect(0, tlSz / 2, tlSz * 12, tlSz / 8);
-            
+
             player.draw();
         }
     });
@@ -346,7 +338,7 @@ startLoop = function() {
 }
 
 
-/* 
+/*
 =======================================================
 utils
 taken from the internet :) and re-adapted where needed
@@ -404,7 +396,7 @@ function shuffleArray(array) {
     return array;
 }
 
-/* 
+/*
 =======================================================
 shaking handling, taken from internet and adapted
 =======================================================
@@ -452,13 +444,13 @@ function animate() {
     //
     //postShake();
     setTimeout(function() {
-        ctx.restore()
+        ctx.restore();
     }, shakeDuration, this)
 }
 
 
 
-/* 
+/*
 =======================================================
 Handling mute sound on desktop
 =======================================================
