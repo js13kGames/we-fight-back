@@ -130,7 +130,7 @@ OBJECT POOL
 
 
 create_pool = function() {
-    POOL = []
+    POOL = [];
     for (let i = 0; i <= 300; i++) {
         const oo = new obj();
         oo.isActive = false;
@@ -140,13 +140,10 @@ create_pool = function() {
 }
 
 getFromPool = function() {
-    for (let i = 0; i <= POOL.length - 1; i++) {
-        if (POOL[i].isActive == false) {
-            POOL[i].isActive = true;
-            POOL[i].flaggedRemove = false;
-            return POOL[i];
-        }
-    }
+    const element = POOL.find((element) => !element.isActive);
+    element.isActive = true;
+    element.flaggedRemove = false;
+    return element;
 }
 
 
