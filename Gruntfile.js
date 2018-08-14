@@ -21,7 +21,7 @@ module.exports = function (grunt) {
           hoist_vars    : false, // hoist variable declarations
           if_return     : true,  // optimize if-s followed by return/continue
           join_vars     : true,  // join var declarations
-          cascade       : true,  // try to cascade `right` into `left` in sequences
+          //cascade       : true,  // try to cascade `right` into `left` in sequences
           side_effects  : true,  // drop side-effect-free statements
           negate_iife   : true,
           pure_getters  : true,
@@ -77,14 +77,14 @@ module.exports = function (grunt) {
           options: {
             archive: 'dist/game.zip',
             mode: 'zip',
-            level: 9
+            level: 9,
           },
           files: [{
             expand: true,
             flatten: false,
             cwd: './dist',
             src: ['index.html', 'img/*'],
-            dest: './'
+            dest: './',
           }],
         },
       },
@@ -103,7 +103,7 @@ module.exports = function (grunt) {
     var done = this.async();
     fs.stat('dist/game.zip', function(err, zip) {
       if (zip.size > 13312) {
-        //If size in bytes greater than 13kb
+        // If size in bytes greater than 13kb
         grunt.log.error("Zipped file greater than 13kb \x07 \n");
         grunt.log.error("WARNING! FILESIZE IS TOO BIG!");
         grunt.log.error("Zip is " + zip.size + " bytes when js13k max is 13,312 bytes");
