@@ -2056,9 +2056,9 @@ Math.degrees = function(radians) {
 };
 
 function shuffleArray(array) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = array[i];
         array[i] = array[j];
         array[j] = temp;
     }
@@ -2071,34 +2071,34 @@ shaking handling, taken from internet and adapted
 =======================================================
 */
 
-ctx = x
-cv = x
+const ctx = x;
+const cv = x;
 
-sdu = 200; //shake duration
-sst = -1; //shake start time
+const shakeDuration = 200; //shake duration
+let shakeStartTime = -1; //shake start time
 
 function preShake() {
-    if (sst == -1) return;
-    var dt = Date.now() - sst;
-    if (dt > sdu) {
-        sst = -1;
+    if (shakeStartTime === -1) return;
+    const dt = Date.now() - shakeStartTime;
+    if (dt > shakeDuration) {
+        shakeStartTime = -1;
         return;
     }
-    var easingCoef = dt / sdu;
-    var easing = Math.pow(easingCoef - 1, 3) + 1;
+    const easingCoef = dt / shakeDuration;
+    const easing = Math.pow(easingCoef - 1, 3) + 1;
     ctx.save();
-    var dx = easing * (Math.cos(dt * 0.1) + Math.cos(dt * 0.3115)) * 5;
-    var dy = easing * (Math.sin(dt * 0.05) + Math.sin(dt * 0.057113)) * 5;
+    const dx = easing * (Math.cos(dt * 0.1) + Math.cos(dt * 0.3115)) * 5;
+    const dy = easing * (Math.sin(dt * 0.05) + Math.sin(dt * 0.057113)) * 5;
     ctx.translate(dx, dy);
 }
 
 function postShake() {
-    if (sst == -1) return;
+    if (shakeStartTime === -1) return;
     ctx.restore();
 }
 
 function startShake() {
-    sst = Date.now();
+    shakeStartTime = Date.now();
 }
 
 function animate() {
@@ -2114,7 +2114,7 @@ function animate() {
     //postShake();
     setTimeout(function() {
         ctx.restore()
-    }, sdu, this)
+    }, shakeDuration, this)
 }
 
 
@@ -2126,9 +2126,9 @@ Handling mute sound on desktop
 */
 document.onkeypress = function(evt) {
     evt = evt || window.event;
-    var charCode = evt.keyCode || evt.which;
-    var charStr = String.fromCharCode(charCode);
-    if (charStr == "m" || charStr == "M") {
-        muteMusic()
+    const charCode = evt.keyCode || evt.which;
+    const charStr = String.fromCharCode(charCode);
+    if (charStr === 'm' || charStr === 'M') {
+        muteMusic();
     }
 };
