@@ -1,15 +1,15 @@
 module.exports = function (grunt) {
 
   grunt.initConfig({
-     pkg: grunt.file.readJSON('package.json'),
-     uglify: {
+    pkg: grunt.file.readJSON('package.json'),
+    uglify: {
       options: {
         compress: {
-          sequences     : true,  // join consecutive statemets with the “comma operator”
+          sequences     : true,  // join consecutive statements with the “comma operator”
           properties    : true,  // optimize property access: a["foo"] → a.foo
           dead_code     : true,  // discard unreachable code
           drop_debugger : true,  // discard “debugger” statements
-          unsafe        : true, // some unsafe optimizations (see below)
+          unsafe        : true,  // some unsafe optimizations (see below)
           unsafe_comps  : true,
           conditionals  : true,  // optimize if-s and conditional expressions
           comparisons   : true,  // optimize comparisons
@@ -23,24 +23,23 @@ module.exports = function (grunt) {
           join_vars     : true,  // join var declarations
           cascade       : true,  // try to cascade `right` into `left` in sequences
           side_effects  : true,  // drop side-effect-free statements
-          negate_iife   :true,
-          pure_getters  :true,
+          negate_iife   : true,
+          pure_getters  : true,
           warnings      : true,  // warn about potentially dangerous optimizations/code
           global_defs   : {},    // global definitions
-          drop_console  :true,          
+          drop_console  : true,
         },
         mangle: {
-          toplevel      :true,
+          toplevel      : true,
         },
-
       },
-       build: {
+      build: {
         files: {
           'dist/testgame.min.js': 'dist/concat.min.js'
-        }
-        }
-     },
-     concat: {
+        },
+      },
+    },
+    concat: {
     options: {
       separator: ';',
     },
@@ -49,62 +48,57 @@ module.exports = function (grunt) {
       dest: 'dist/concat.min.js',
     },
   },
-     processhtml: {
-       dist: {
-         options: {
-           process: true,
-           data: {
-             title: 'A Day In The Life',
-           }
-         },
-         files: {
-           'dist/index.min.html': ['src/production.html']
-         }
-       }
-     },
-     htmlmin: {
-       dist: {
-         options: {
-           removeComments: true,
-           collapseWhitespace: true
-         },
-         files: {
-           'dist/index.html': 'dist/index.min.html'
-         }
-       }
-     },
-
-     compress: {
-      main: {
+    processhtml: {
+      dist: {
         options: {
-          archive: 'dist/game.zip',
-          mode: 'zip',
-          level: 9
+          process: true,
+            data: {
+              title: 'A Day In The Life',
+            },
+          },
+          files: {
+            'dist/index.min.html': ['src/production.html']
+          },
         },
-        files: [{
-          expand: true,
-          flatten: false,
-          cwd: './dist',
-          src: ['index.html', 'img/*'],
-          dest: './'
-        }]
-      }
-    },
+      },
+      htmlmin: {
+        dist: {
+          options: {
+            removeComments: true,
+            collapseWhitespace: true
+          },
+          files: {
+            'dist/index.html': 'dist/index.min.html'
+          },
+        },
+      },
+      compress: {
+        main: {
+          options: {
+            archive: 'dist/game.zip',
+            mode: 'zip',
+            level: 9
+          },
+          files: [{
+            expand: true,
+            flatten: false,
+            cwd: './dist',
+            src: ['index.html', 'img/*'],
+            dest: './'
+          }],
+        },
+      },
+      copy: {
+        main: {
+          files: [
+            {expand: true, flatten: true, src: ['src/img/*'], dest: 'dist/img', filter: 'isFile'},
+          ],
+        },
+      },
+      clean: ['dist*//*.min.*']
+    });
 
-    copy: {
-    main: {
-      files: [
-        {expand: true, flatten: true, src: ['src/img/*'], dest: 'dist/img', filter: 'isFile'},
-      ],
-    },
-  },
-
-     clean: ['dist*//*.min.*']
-
-
-   });
-
-  var fs = require('fs');
+  const fs = require('fs');
   grunt.registerTask('sizecheck', function() {
     var done = this.async();
     fs.stat('dist/game.zip', function(err, zip) {
@@ -113,7 +107,7 @@ module.exports = function (grunt) {
         grunt.log.error("Zipped file greater than 13kb \x07 \n");
         grunt.log.error("WARNING! FILESIZE IS TOO BIG!");
         grunt.log.error("Zip is " + zip.size + " bytes when js13k max is 13,312 bytes");
-      }else{
+      } else {
         grunt.log.error("Zip is " + zip.size + " bytes!");
         grunt.log.error("Filesize OK!");
       }
