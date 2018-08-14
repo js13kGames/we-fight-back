@@ -28,7 +28,7 @@ The code is fully commented, check it out for more information.
 ### CREDITS
 Developed by Christian Paul  
 feel free to contact me at:  
-https://github.com/jaller94
+https://github.com/jaller94  
 http://chrpaul.de
 
 ### LICENSE
