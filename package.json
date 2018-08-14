@@ -12,7 +12,7 @@
     "grunt-contrib-htmlmin": "^2.0.0",
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-less": "latest",
-    "grunt-contrib-uglify": "3.4.0",
+    "grunt-contrib-uglify-es": "^3.3.0",
     "grunt-contrib-watch": "latest",
     "grunt-processhtml": "^0.4.0",
     "jshint-stylish": "latest"

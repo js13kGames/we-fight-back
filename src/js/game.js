@@ -85,11 +85,11 @@ spacingList["p_focus"] = -250
 spacingList["p_coins"] = -400
 clTimeout = null
 //colors
-c1 = "#70c1b3"
-c2 = "#ffe066"
-c3 = "#f25f5c"
-c4 = "#247ba0"
-c5 = "#50514f"
+const c1 = "#70c1b3"
+const c2 = "#ffe066"
+const c3 = "#f25f5c"
+const c4 = "#247ba0"
+const c5 = "#50514f"
 
 //reset score testing purposes
 //localStorage.setItem("RECORD", 0);
