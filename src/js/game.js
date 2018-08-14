@@ -695,7 +695,7 @@ changePower = function() {
             currentScrolling = fastScrollingSpeed
             scrollingSpeed = currentScrolling
         }
-        if (lostList[0] == "p_focus") {
+        if (lostList[0] === "p_focus") {
             playAt(200)
         }
         for (var i = 0; i <= objects.length - 1; i++) {
@@ -719,10 +719,10 @@ changePower = function() {
             y: a.height / 2
         })
         setTimeout(function() {
-            if (gamePhase == 1) {
+            if (gamePhase === 1) {
                 TCTX.clearRect(0, a.height - tlSz * 0.8, tlSz * 12, tlSz * 3)
             }
-        }, 5000, this)
+        }, 5000, this);
         setTimeout(function() {
             flash = false
             powerCounter = 0
@@ -1348,223 +1348,168 @@ GAME LOOP
 startLoop = function() {
     var loop = kontra.gameLoop({
         update: function() {
-            //UPDATE THINGS AND REMOVE IF NEEDED
-            //EFFECTS
-
-            /*
-            var stt = 0
-            for (var i = 0; i <= POOL.length - 1; i++) {
-                if (POOL[i].isActive == false) {
-                    stt++
-                }
-            }
-            console.log(POOL.length, stt)
-            */
-
 
             //move/refresh/remove/create ground when needed
-            if (gamePhase == 1 || gamePhase == 0 || gamePhase == 4) {
+            if (gamePhase === 1 || gamePhase === 0 || gamePhase === 4) {
                 for (var i = 0; i <= ground.length - 1; i++) {
                     ground[i].update()
                 }
                 for (var i = 0; i <= ground.length - 1; i++) {
-                    if (ground[i].flaggedRemove == true) {
-                        ground[i].isActive = false
-                        removeFromArray(ground, ground[i])
-                        //ground[i] = null
+                    if (ground[i].flaggedRemove === true) {
+                        ground[i].isActive = false;
+                        removeFromArray(ground, ground[i]);
                     }
                 }
                 currentGDistance += scrollingSpeed
                 var distance = groundDistance
-                if (scrollingSpeed == fastScrollingSpeed) {
-                    distance = distance * 1
+                if (scrollingSpeed === fastScrollingSpeed) {
+                    distance = distance * 1;
                 }
                 if (currentGDistance >= distance) {
-                    currentGDistance = 0
-                    createGround()
+                    currentGDistance = 0;
+                    createGround();
                 }
             }
-
-            /*
-            for (var i = 0; i <= POOL.length - 1; i++) {
-                if (POOL[i].isActive == true){
-                POOL[i].update()    
-                }
-                
-            }
-            */
 
             for (var i = 0; i <= pixels.length - 1; i++) {
-                pixels[i].update()
+                pixels[i].update();
             }
 
             for (var i = 0; i <= pixels.length - 1; i++) {
                 if (pixels[i].flaggedRemove == true) {
-                    pixels[i].isActive = false
-                    removeFromArray(pixels, pixels[i])
-                    //pixels[i] = null
+                    pixels[i].isActive = false;
+                    removeFromArray(pixels, pixels[i]);
                 }
             }
 
             for (var i = 0; i <= bgPixels.length - 1; i++) {
-                bgPixels[i].update()
+                bgPixels[i].update();
             }
-
-            /*
-            for (var i = 0; i <= bgPixels.length - 1; i++) {
-                if (bgPixels[i].flaggedRemove == true) {
-                    bgPixels[i].isActive = false
-                    removeFromArray(bgPixels, bgPixels[i])
-                    //bgPixels[i] = null
-                }
-            }
-            */
 
             //check if screen is blurred, to restart sounds if needed
-            if (blurred == true) {
-                if (isMuted == false) {
-                    sequence1.gain.gain.value = 0.1
-                    sequence2.gain.gain.value = 0.05
+            if (blurred === true) {
+                if (isMuted === false) {
+                    sequence1.gain.gain.value = 0.1;
+                    sequence2.gain.gain.value = 0.05;
                 }
             }
             //animate player when needed
-            if (gamePhase == 1 || gamePhase == 4 || gamePhase == 5 || gamePhase == 9) {
-                player.animate()
+            if (gamePhase === 1 || gamePhase === 4 || gamePhase === 5 || gamePhase === 9) {
+                player.animate();
             }
 
-            //
-            /*
-            bgCnt += 1
-            if (bgCnt == 50) {
-                particleBg()
-                bgCnt = 0
-            }
-            */
             //checks for phases
-            if (gamePhase == 1) {
+            if (gamePhase === 1) {
 
-                powerCounter += 1
+                powerCounter += 1;
                 if (powerCounter >= newPowerIn - 100) {
-                    isToChangePower = true
+                    isToChangePower = true;
                 }
                 if (powerCounter >= newPowerIn) {
-                    isToChangePower = true
-                    changePower()
-                    soundChange()
-                    isToChangePower = false
-                    powerCounter = 0
+                    isToChangePower = true;
+                    changePower();
+                    soundChange();
+                    isToChangePower = false;
+                    powerCounter = 0;
                 }
-                /*
-                bgCnt += 1
-                if (bgCnt == 10) {
-                    particleBg()
-                    bgCnt = 0
-                }
-                */
 
-                player.update()
-                house.update()
-
-                for (var i = 0; i <= objects.length - 1; i++) {
-                    objects[i].update()
-                }
-                //
+                player.update();
+                house.update();
+                
+                objects.forEach((object) => object.update());
 
                 //
                 for (var i = 0; i <= objects.length - 1; i++) {
                     if (objects[i].flaggedRemove == true) {
                         objects[i].isActive = false
                         removeFromArray(objects, objects[i])
-                        //objects[i] = null
                     }
                 }
                 //
 
-
-
-                if (isToChangePower == false) {
+                if (isToChangePower === false) {
 
                     //
                     currentDistance += scrollingSpeed
-                    var distance = obj_distance
-                    if (scrollingSpeed == fastScrollingSpeed) {
-                        distance = distance * 2
+                    var distance = obj_distance;
+                    if (scrollingSpeed === fastScrollingSpeed) {
+                        distance = distance * 2;
                     }
                     if (currentDistance >= distance) {
-                        currentDistance = 0
-                        createObstacle()
+                        currentDistance = 0;
+                        createObstacle();
                     }
 
                     //
-                    currentCoinDistance += scrollingSpeed
-                    var distance = coinDistance
+                    currentCoinDistance += scrollingSpeed;
+                    var distance = coinDistance;
                     if (scrollingSpeed == fastScrollingSpeed) {
-                        distance = distance * 1.5
+                        distance = distance * 1.5;
                     }
                     if (currentCoinDistance >= distance) {
-                        currentCoinDistance = 0
-                        if (coinPause == false) {
-                            createCoin()
+                        currentCoinDistance = 0;
+                        if (coinPause === false) {
+                            createCoin();
                         }
                     }
                 }
 
                 if (house.x > -tlSz * 4) {
-                    house.x -= scrollingSpeed
+                    house.x -= scrollingSpeed;
                 }
             } else if (gamePhase == 0) {
                 if (player.x > tlSz) {
-                    player.x -= scrollingSpeed
+                    player.x -= scrollingSpeed;
                 }
                 if (player.x <= tlSz) {
-                    player.x = tlSz
-                    startGame()
-                    TCTX.clearRect(0, a.height - tlSz * 0.8, tlSz * 12, tlSz * 3)
+                    player.x = tlSz;
+                    startGame();
+                    TCTX.clearRect(0, a.height - tlSz * 0.8, tlSz * 12, tlSz * 3);
                 }
                 if (house.x > -tlSz * 4) {
-                    house.x -= scrollingSpeed
+                    house.x -= scrollingSpeed;
                 }
 
             } else if (gamePhase == 4) {
                 if (house.x > tlSz * 2) {
                     if (scrollingSpeed > 2) {
-                        scrollingSpeed -= 0.08
+                        scrollingSpeed -= 0.08;
                     }
-                    house.x -= scrollingSpeed
+                    house.x -= scrollingSpeed;
                 } else {
-                    gamePhase = 5
+                    gamePhase = 5;
                 }
                 if (house.x < tlSz * 10) {
                     if (sequence1.tempo == 200) {
-                        playAt(150)
+                        playAt(150);
                     }
                 }
                 if (house.x < tlSz * 6) {
                     if (sequence1.tempo == 150) {
-                        playAt(120)
+                        playAt(120);
                     }
-                    player.angle = 45
-                    player.y = groundY - tlSz * 0.8
+                    player.angle = 45;
+                    player.y = groundY - tlSz * 0.8;
                 }
                 if (house.x < tlSz * 3) {
                     if (sequence1.tempo == 120) {
-                        playAt(100)
+                        playAt(100);
                     }
-                    player.angle = 90
-                    player.y = groundY - tlSz * 0.8
+                    player.angle = 90;
+                    player.y = groundY - tlSz * 0.8;
                 }
-            } else if (gamePhase == 9) {
+            } else if (gamePhase === 9) {
                 if (player.x < tlSz * 7) {
-                    player.x += 2
+                    player.x += 2;
                 } else {
-                    player.x = tlSz * 7
+                    player.x = tlSz * 7;
                     TCTX.clearRect(0, 0, tlSz * 12, tlSz * 12);
-                    x.clearRect(-100, 0, a.width + 200, a.height)
-                    TCTX.clearRect(-100, 0, a.width + 200, a.height)
-                    clearObjects(true)
-                    for (var i = 0; i <= lostList.length - 1; i++) {
-                        lostList[i] = null
-                    }
+                    x.clearRect(-100, 0, a.width + 200, a.height);
+                    TCTX.clearRect(-100, 0, a.width + 200, a.height);
+                    clearObjects(true);
+                    lostList.forEach((item) => {
+                        item = null
+                    });
                     initVar(true)
                     initializeGame(true)
                     gamePhase = 0
