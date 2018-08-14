@@ -63,33 +63,33 @@ ONE TIME VAR INITIALIZATION
 =======================================================
 */
 
-x = kontra.canvas.getContext("2d");
+x = kontra.canvas.getContext('2d');
 x.imageSmoothingEnabled = false;
 x.webkitImageSmoothingEnabled = false;
 x.mozImageSmoothingEnabled = false;
 x.msImageSmoothingEnabled = false;
 x.oImageSmoothingEnabled = false;
-imgPath = "img/"
-OBU = imgPath + "obstacle.png"
-namesList = []
-namesList["p_djump"] = "DOUBLE JUMP"
-namesList["p_dash"] = "DASH"
-namesList["p_glide"] = "FLY"
-namesList["p_focus"] = "FOCUS"
-namesList["p_coins"] = "ATTRACT"
-spacingList = []
-spacingList["p_djump"] = -300
-spacingList["p_dash"] = -200
-spacingList["p_glide"] = -150
-spacingList["p_focus"] = -250
-spacingList["p_coins"] = -400
-clTimeout = null
+const imgPath = 'img/';
+OBU = `${imgPath}obstacle.png`;
+const namesList = [];
+namesList['p_djump'] = 'DOUBLE JUMP';
+namesList['p_dash'] = 'DASH';
+namesList['p_glide'] = 'FLY';
+namesList['p_focus'] = 'FOCUS';
+namesList['p_coins'] = "ATTRACT";
+const spacingList = [];
+spacingList['p_djump'] = -300;
+spacingList['p_dash'] = -200;
+spacingList['p_glide'] = -150;
+spacingList['p_focus'] = -250;
+spacingList['p_coins'] = -400;
+let clTimeout = null;
 //colors
-const c1 = "#70c1b3"
-const c2 = "#ffe066"
-const c3 = "#f25f5c"
-const c4 = "#247ba0"
-const c5 = "#50514f"
+const c1 = '#70c1b3';
+const c2 = '#ffe066';
+const c3 = '#f25f5c';
+const c4 = '#247ba0';
+const c5 = '#50514f';
 
 //reset score testing purposes
 //localStorage.setItem("RECORD", 0);
@@ -131,20 +131,20 @@ OBJECT POOL
 
 create_pool = function() {
     POOL = []
-    for (var i = 0; i <= 300; i++) {
-        var oo = new obj()
-        oo.isActive = false
-        oo.flaggedRemove = true
-        POOL.push(oo)
+    for (let i = 0; i <= 300; i++) {
+        const oo = new obj();
+        oo.isActive = false;
+        oo.flaggedRemove = true;
+        POOL.push(oo);
     }
 }
 
 getFromPool = function() {
-    for (var i = 0; i <= POOL.length - 1; i++) {
+    for (let i = 0; i <= POOL.length - 1; i++) {
         if (POOL[i].isActive == false) {
-            POOL[i].isActive = true
-            POOL[i].flaggedRemove = false
-            return POOL[i]
+            POOL[i].isActive = true;
+            POOL[i].flaggedRemove = false;
+            return POOL[i];
         }
     }
 }
@@ -157,7 +157,7 @@ MAIN GAME OBJECT
 */
 obj = function() {
     this.create = function(x, y, spr, type) {
-            if (spr != "") {
+            if (spr != '') {
                 this.image = kontra.assets.images[spr]
                 //this.image.src = spr
             }
@@ -598,7 +598,7 @@ MISC functions
 */
 
 //initialize variables
-initVar = function(noGround) {
+const initVar = function(noGround) {
     if (!noGround) {
         noGround = false
     }
