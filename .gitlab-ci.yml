@@ -14,7 +14,7 @@ build:
   stage: build
   script:
   - npm ci
-  - npm run-script build -- -d public
+  - npm run-script build -- -d public --public-url ./
   artifacts:
     paths:
     - public
