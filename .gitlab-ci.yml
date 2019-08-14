@@ -13,4 +13,4 @@ build:
   - npm run-script build
   artifacts:
     paths:
-    - public
+    - dist
