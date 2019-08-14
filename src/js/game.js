@@ -12,10 +12,10 @@ Thank you for playing!
 
 */
 
-import {
-    createTCVS,
-    drawText,
-} from './text.js';
+// import {
+//     createTCVS,
+//     drawText,
+// } from './text.js';
 
 let blurred = false;
 window.onblur = function() {
@@ -23,6 +23,18 @@ window.onblur = function() {
     //sequence2.gain.gain.value = 0;
     blurred = true;
 }
+
+const levels = [
+    {
+        strings: 'monster;hero;shoot;kill;save;family;help;quick;gun;home;protect;earth;child;love;nature;ego;lost;fight;tears;trash;pollution;revenge;catastrophe;chaos;last;chance;WE;FIGHT;BACK',
+    },
+    {
+        strings: 'incoming monster;fighting heroes;final frontier;combined efforts;total apocalypse;giant creatures;no questions;find vulnerability;not ready;need ammo;breached barrier;hurt monstrosity;damaged planet;seeks revenge;endless fight;everlasting battle;lost friends;forgotten tears;but whatever comes;we fight back',
+    },
+    {
+        strings: 'We are the heroes.;We fight off monsters.;The city is protected by us.;Our scientists extracted dangerous gene mutations from wild creatures.;The industrial trash caused modifications to life forms on earth.;They will kill us all.;Watch your back.;Can you image the destruction that follows each attack?;Human society was harvesting resources beyond what mother earth could provide.;The unbalanced ecosystem became uncontrollable for surviving tribes.;Cleaning up the mistakes of former generations is certainly impossible at this point.But whatever happens,;we fight back!'
+    },
+];
 
 const a = document.getElementById('a');
 const b = document.getElementById('b');
@@ -46,14 +58,21 @@ document.onkeypress = function(evt) {
         curPos++;
     }
     if (evt.key === 'Enter' && curPos === currentString.length) {
-        console.log('yes');
         startString(remainingStrings.shift());
+    }
+    if (evt.key == 1) {
+        startLevel(0);
+    }
+    if (evt.key == 2) {
+        startLevel(1);
+    }
+    if (evt.key == 3) {
+        startLevel(2);
     }
 };
 
-function initializeGame() {
-    remainingStrings = 'monster;hero;shoot;kill;save;family;help;quick;gun;home;protect;earth;child;love;nature;ego;lost;fight;tears;trash;polution;revenge;catastrophe;chaos;last;chance;WE;FIGHT;BACK'.split(';');
-    remainingStrings = 'WE FIGHT BACK'.split(';');
+function startLevel(id) {
+    remainingStrings = levels[id].strings.split(';');
     startString(remainingStrings.shift());
 }
 
@@ -71,7 +90,7 @@ function act() {
 }
 
 function init() {
-    initializeGame();
+    startLevel(0);
     startLoop();
 }
 
