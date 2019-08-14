@@ -1,4 +1,4 @@
-//I'm drawing the texts using Pixel Font algorithm 
+//I'm drawing the texts using Pixel Font algorithm
 //adapted to have right alignment, and to work correctly with my game.
 //
 //It is drawing on a different canvas which is overlapping the main game canvas.
@@ -7,20 +7,21 @@
 //
 //TCVS is the canvas for the texts
 //TCTX is the context
-var TCVS, TCTX
+let TCVS, TCTX;
 
 //init
-function createTCVS() {
-    TCVS = b
+export function createTCVS() {
+    TCVS = document.getElementById('b');
     //TCVS.style.backgroundColor = "";
-    TCTX = TCVS.getContext("2d");
+    TCTX = TCVS.getContext('2d');
     document.body.appendChild(TCVS);
+    return TCTX;
 }
 
 
 //draw text
 //canvas is not cleared, and fillstyle not set!
-function drawText(string, scl, pos, rAlign ) {
+export function drawText(string, scl, pos, rAlign ) {
     if (!rAlign){
         var rAlign = false;
     }
@@ -41,11 +42,11 @@ function drawText(string, scl, pos, rAlign ) {
         }
 
         if (rAlign == false) {
-            var currX = 0;
+            let currX = 0;
             for (let i = 0; i < needed.length; i++) {
-                letter = needed[i];
-                var currY = 0;
-                var addX = 0;
+                const letter = needed[i];
+                let currY = 0;
+                let addX = 0;
                 for (let y = 0; y < letter.length; y++) {
                     var row = letter[y];
                     for (let x = 0; x < row.length; x++) {
@@ -59,11 +60,11 @@ function drawText(string, scl, pos, rAlign ) {
                 currX += size + addX;
             }
         } else {
-            var currX = 0;
-            for (i = 0; i < needed.length; i++) {
-                letter = needed[needed.length-i-1];
-                var currY = 0;
-                var addX = 0;
+            let currX = 0;
+            for (let i = 0; i < needed.length; i++) {
+                const letter = needed[needed.length-i-1];
+                let currY = 0;
+                let addX = 0;
                 for (var y = 0; y < letter.length; y++) {
                     var row = letter[y];
                     for (var x = 0; x < row.length; x++) {
