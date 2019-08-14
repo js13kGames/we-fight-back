@@ -1,16 +1,45 @@
 image: node:latest
 
 cache:
+  key: ${CI_COMMIT_REF_SLUG}
   paths:
   - node_modules/
 
-before_script:
-  - npm ci
+stages:
+  - build
+  - deploy
+  - bundle
 
 build:
   stage: build
   script:
-  - npm run-script build
+  - npm ci
+  - npm run-script build -- -d public
   artifacts:
     paths:
-    - dist
+    - public
+
+pages:
+  stage: deploy
+  script:
+  - echo "Deploying to Gitlab Pages"
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
+
+bundle:
+  stage: bundle
+  script:
+  - apt-get update
+  - apt-get install zip
+  - cd public
+  - zip game *.html *.js
+  - cd -
+  - mv public/game.zip ./
+  - stat --printf="%s" game.zip
+  #- test $(stat --printf="%s" game.zip) -lt 13312
+  artifacts:
+    paths:
+    - game.zip

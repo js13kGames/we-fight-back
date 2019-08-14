@@ -15,3 +15,6 @@ trim_trailing_whitespace = true
 # In Markdown a trailing double space is a line break.
 [*.md]
 trim_trailing_whitespace = false
+
+[*.yml]
+indent_size = 2
