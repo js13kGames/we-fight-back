@@ -5,41 +5,32 @@ cache:
   paths:
   - node_modules/
 
-stages:
-  - build
-  - deploy
-  - bundle
+before_script:
+- npm ci
 
 build:
-  stage: build
+  before_script:
+  - apt-get update
+  - apt-get install zip
   script:
-  - npm ci
-  - npm run-script build -- -d public --public-url ./
+  - npm run-script build -- --public-url ./ --no-source-maps --no-content-hash
+  - cd dist
+  - zip game *.html *.js
+  - cd -
+  - mv dist/game.zip ./
+  - echo 'file_size $(stat --printf="%s" game.zip)' > metrics.txt
+  #- test $(stat --printf="%s" game.zip) -lt 13312
   artifacts:
     paths:
-    - public
+    - game.zip
+    reports:
+      metrics: metrics.txt
 
 pages:
-  stage: deploy
   script:
-  - echo "Deploying to Gitlab Pages"
+  - npm run-script build -- -d public --public-url ./
   artifacts:
     paths:
     - public
   only:
   - master
-
-bundle:
-  stage: bundle
-  script:
-  - apt-get update
-  - apt-get install zip
-  - cd public
-  - zip game *.html *.js
-  - cd -
-  - mv public/game.zip ./
-  - stat --printf="%s" game.zip
-  #- test $(stat --printf="%s" game.zip) -lt 13312
-  artifacts:
-    paths:
-    - game.zip
