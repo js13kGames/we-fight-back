@@ -12,6 +12,7 @@ build:
   before_script:
   - apt-get update
   - apt-get install zip
+  - npm ci
   script:
   - npm run-script build -- --public-url ./ --no-source-maps --no-content-hash
   - cd dist
