@@ -19,6 +19,9 @@ Thank you for playing!
 
 'use strict';
 
+const FONT_HEIGHT = 10;
+
+const MENU = 3;
 const PLAYING = 2;
 const LOST = 1;
 const WON = 0;
@@ -45,6 +48,23 @@ const levels = [
     },
 ];
 
+// const au = new AudioContext();
+// const G = au.createGain();
+// const D = [15];
+// for(let i in D) {
+//     const o = au.createOscillator();
+//     o.type='sawtooth';
+//     if(D[i]) {
+//         o.connect(G);
+//         G.connect(au.destination);
+//         o.start(i*.01);
+//         o.frequency.setValueAtTime(440*1.06**(13-D[i]),i*.5);
+//         G.gain.setValueAtTime(1,i*.01);
+//         G.gain.setTargetAtTime(.1,0.0,0.2);
+//         o.stop(i*.1+.09);
+//     }
+// }
+
 class TextTyper {
     constructor(stringList) {
         this.remainingStrings = stringList.split(';');
@@ -54,23 +74,23 @@ class TextTyper {
     }
 
     onKeyPress(key) {
-        const expected = this.currentFloater.string.substr(this.currentPosition, 1).toLowerCase();
-        console.log(expected, key);
+        const currentString = this.currentFloater.string;
+        const expected = currentString.substr(this.currentPosition, 1).toLowerCase();
         if (key.toLowerCase() == expected) {
             this.currentPosition++;
             if (this.wordDone()) {
                 this.floaters.shift();
-                this.spawnFloater();
+                this._spawnFloater();
                 if (this.sequenceDone()) {
                     win();
                 } else {
-                    this.startFloater(this.floaters[0]);
+                    this._startFloater(this.floaters[0]);
                 }
             }
         }
     }
 
-    spawnFloater() {
+    _spawnFloater() {
         if (this.floaters.length > 5) return;
         if (this.remainingStrings.length == 0) return;
         this.floaters.push({
@@ -79,11 +99,10 @@ class TextTyper {
         });
     }
 
-    startFloater(floater) {
+    _startFloater(floater) {
         this.currentFloater = floater;
         this.currentPosition = 0;
     }
-
 
     wordDone() {
         return this.currentPosition == this.currentFloater.string.length;
@@ -93,13 +112,27 @@ class TextTyper {
         return (this.remainingStrings == 0) && (this.floaters.length == 0);
     }
 
+    start() {
+        this._spawnFloater();
+        this._startFloater(this.floaters[0]);
+    }
+
     draw(ctx) {
         this.floaters.forEach((floater, i) => {
-            ctx.fillStyle = '#fff';
-            ctx.fillText(floater.string, calcX(floater), 15 * i + 20);
+            const x = calcX(floater)
+            const y = 15 * i + 20;
+            if (floater === this.currentFloater) {
+                ctx.fillStyle = '#000';
+                const margin = 5;
+                ctx.fillRect(x - margin, y - margin, ctx.measureText(floater.string).width + 2 * margin, FONT_HEIGHT + 2 * margin);
+                ctx.fillStyle = '#fff';
+            } else {
+                ctx.fillStyle = '#000';
+            }
+            ctx.fillText(floater.string, x, y + FONT_HEIGHT);
             if (floater === this.currentFloater) {
                 ctx.fillStyle = '#0f0';
-                ctx.fillText(floater.string.substr(0, this.currentPosition), calcX(floater), 15 * i + 20);
+                ctx.fillText(floater.string.substr(0, this.currentPosition), x, y + FONT_HEIGHT);
             }
         });
     }
@@ -132,18 +165,27 @@ document.onkeypress = function(evt) {
     if (evt.key == 5) {
         textTyper.spawnFloater();
     }
-    textTyper.onKeyPress(evt.key);
+    if (evt.key == 9) {
+        meters+=8;
+    }
+    if (evt.key == 0) {
+        meters-=8;
+        console.log(meters);
+    }
+    if (currentState == PLAYING) {
+        textTyper.onKeyPress(evt.key);
+    }
 };
 
 function startLevel(id) {
     currentState = PLAYING;
     textTyper = new TextTyper(levels[id].strings);
-    textTyper.spawnFloater();
-    textTyper.startFloater(textTyper.floaters[0]);
+    textTyper.start();
 }
 
 function startLoop() {
     interval = setInterval(act, 16);
+    window.requestAnimationFrame(draw);
 }
 
 function win() {
@@ -157,31 +199,62 @@ function calcX(floater) {
     return 240 - (progress * 200);
 }
 
+let meters = 0;
+
 function act() {
+    meters++;
+}
+
+function draw() {
     x.clearRect(0,0,240,160);
     if (currentState == PLAYING) {
         textTyper.draw(x);
     }
+
+    // buildings
+    x.fillStyle = '#eee';
+    for (var i = 0; i < 100; i++) {
+        x.fillRect((meters - i * 320 + 1024) / 8, 86, 32, 64);
+    }
+
+    x.fillStyle = '#ddd';
+    for (var i = 0; i < 500; i++) {
+        x.fillRect((meters - i * 320 + 1024) / 4, 48, 32, 128);
+    }
+
     //x.translate(Math.random(), Math.random());
     // player
-    x.fillStyle = '#060';
-    x.fillRect(10, 120, 32, 32);
+    x.fillStyle = '#080';
+    x.fillRect(10, 120, 48, 32);
     // monster
-    x.fillStyle = '#600';
+    x.fillStyle = '#800';
     x.fillRect(200, 80, 100, 70);
+
+    x.fillStyle = '#000';
+    x.fillRect(-64, 150, 512, 64);
+
     if (currentState == WON) {
-        x.fillStyle = '#ff0';
+        x.fillStyle = '#000';
         x.fillText('The city is save... for now.', 20, 50);
         x.fillText('Press 1, 2 or 3 to start a level.', 20, 70);
         x.fillText('Press 4 for the debug level.', 20, 90);
     }
+    if (currentState == MENU) {
+        x.fillStyle = '#000';
+        x.fillText('Pick your town', 20, 20);
+        x.fillText('1  Words', 20, 40);
+        x.fillText('2  Word pairs', 20, 60);
+        x.fillText('3  Sentences', 20, 80);
+        x.fillText('4  Debug', 20, 100);
+    }
+    window.requestAnimationFrame(draw);
 }
 
 function init() {
-    startLevel(0);
+    currentState = MENU;
     startLoop();
 }
 
 init();
 
-x.font = '10px monospace';
+x.font = `${FONT_HEIGHT}px monospace`;
