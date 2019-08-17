@@ -45,52 +45,78 @@ const levels = [
     },
 ];
 
-const a = document.getElementById('a');
-const b = document.getElementById('b');
+class TextTyper {
+    constructor(stringList) {
+        this.remainingStrings = stringList.split(';');
+        this.floaters = [];
+        this.currentPosition = 0;
+        this.currentFloater;
+    }
+
+    onKeyPress(key) {
+        const expected = this.currentFloater.string.substr(this.currentPosition, 1).toLowerCase();
+        console.log(expected, key);
+        if (key.toLowerCase() == expected) {
+            this.currentPosition++;
+            if (this.wordDone()) {
+                this.floaters.shift();
+                this.spawnFloater();
+                if (this.sequenceDone()) {
+                    win();
+                } else {
+                    this.startFloater(this.floaters[0]);
+                }
+            }
+        }
+    }
+
+    spawnFloater() {
+        if (this.floaters.length > 5) return;
+        if (this.remainingStrings.length == 0) return;
+        this.floaters.push({
+            spawned: new Date(),
+            string: this.remainingStrings.shift(),
+        });
+    }
+
+    startFloater(floater) {
+        this.currentFloater = floater;
+        this.currentPosition = 0;
+    }
+
+
+    wordDone() {
+        return this.currentPosition == this.currentFloater.string.length;
+    }
+
+    sequenceDone() {
+        return (this.remainingStrings == 0) && (this.floaters.length == 0);
+    }
+
+    draw(ctx) {
+        this.floaters.forEach((floater, i) => {
+            ctx.fillStyle = '#fff';
+            ctx.fillText(floater.string, calcX(floater), 15 * i + 20);
+            if (floater === this.currentFloater) {
+                ctx.fillStyle = '#0f0';
+                ctx.fillText(floater.string.substr(0, this.currentPosition), calcX(floater), 15 * i + 20);
+            }
+        });
+    }
+}
+
+const a = document.getElementById('fg');
+const b = document.getElementById('bg');
 
 const x = a.getContext('2d');
 x.imageSmoothingEnabled = false;
 
 let interval;
-let curPos;
-let currentFloater;
-let floaters = [];
 let currentState;
-let remainingStrings = [];
-
-function spawnFloater() {
-    if (floaters.length > 5) return;
-    if (remainingStrings.length === 0) return;
-    floaters.push({
-        spawned: new Date(),
-        string: remainingStrings.shift(),
-    });
-}
-
-function startFloater(floater) {
-    currentFloater = floater;
-    curPos = 0;
-}
+let textTyper;
 
 document.onkeypress = function(evt) {
     evt = evt || window.event;
-    if (currentFloater) {
-        if (evt.key.toLowerCase() === currentFloater.string.substr(curPos, 1).toLowerCase()) {
-            curPos++;
-            if (curPos === currentFloater.string.length) {
-                floaters.shift();
-                spawnFloater();
-                if (floaters.length > 0) {
-                    startFloater(floaters[0]);
-                } else {
-                    win();
-                }
-            }
-        }
-    }
-    if (evt.key === '5') {
-        spawnFloater();
-    }
     if (evt.key == 1) {
         startLevel(0);
     }
@@ -103,15 +129,17 @@ document.onkeypress = function(evt) {
     if (evt.key == 4) {
         startLevel(3);
     }
+    if (evt.key == 5) {
+        textTyper.spawnFloater();
+    }
+    textTyper.onKeyPress(evt.key);
 };
 
 function startLevel(id) {
     currentState = PLAYING;
-    floaters = [];
-    currentFloater = undefined;
-    remainingStrings = levels[id].strings.split(';');
-    spawnFloater();
-    startFloater(floaters[0]);
+    textTyper = new TextTyper(levels[id].strings);
+    textTyper.spawnFloater();
+    textTyper.startFloater(textTyper.floaters[0]);
 }
 
 function startLoop() {
@@ -130,17 +158,9 @@ function calcX(floater) {
 }
 
 function act() {
-    x.fillStyle = '#222';
-    x.fillRect(0,0,240,160);
-    if (currentState === PLAYING) {
-        floaters.forEach((floater, i) => {
-            x.fillStyle = '#fff';
-            x.fillText(floater.string, calcX(floater), 15 * i + 20);
-            if (floater === currentFloater) {
-                x.fillStyle = '#0f0';
-                x.fillText(floater.string.substr(0, curPos), calcX(floater), 15 * i + 20);
-            }
-        });
+    x.clearRect(0,0,240,160);
+    if (currentState == PLAYING) {
+        textTyper.draw(x);
     }
     //x.translate(Math.random(), Math.random());
     // player
@@ -149,7 +169,7 @@ function act() {
     // monster
     x.fillStyle = '#600';
     x.fillRect(200, 80, 100, 70);
-    if (currentState === WON) {
+    if (currentState == WON) {
         x.fillStyle = '#ff0';
         x.fillText('The city is save... for now.', 20, 50);
         x.fillText('Press 1, 2 or 3 to start a level.', 20, 70);
