@@ -17,6 +17,8 @@ Thank you for playing!
 //     drawText,
 // } from './text.js';
 
+'use strict';
+
 const PLAYING = 2;
 const LOST = 1;
 const WON = 0;
@@ -51,29 +53,43 @@ x.imageSmoothingEnabled = false;
 
 let interval;
 let curPos;
-let currentString = 'monster';
+let currentFloater;
+let floaters = [];
 let currentState;
 let remainingStrings = [];
 
-function startString(string) {
-    currentString = string;
+function spawnFloater() {
+    if (floaters.length > 5) return;
+    if (remainingStrings.length === 0) return;
+    floaters.push({
+        spawned: new Date(),
+        string: remainingStrings.shift(),
+    });
+}
+
+function startFloater(floater) {
+    currentFloater = floater;
     curPos = 0;
 }
 
 document.onkeypress = function(evt) {
     evt = evt || window.event;
-    if (evt.key.toLowerCase() === currentString.substr(curPos, 1).toLowerCase()) {
-        curPos++;
-    }
-    if (currentState === PLAYING) {
-        if (evt.key === 'Enter' && curPos === currentString.length) {
-            const newString = remainingStrings.shift();
-            if (newString) {
-                startString(newString);
-            } else {
-                win();
+    if (currentFloater) {
+        if (evt.key.toLowerCase() === currentFloater.string.substr(curPos, 1).toLowerCase()) {
+            curPos++;
+            if (curPos === currentFloater.string.length) {
+                floaters.shift();
+                spawnFloater();
+                if (floaters.length > 0) {
+                    startFloater(floaters[0]);
+                } else {
+                    win();
+                }
             }
         }
+    }
+    if (evt.key === '5') {
+        spawnFloater();
     }
     if (evt.key == 1) {
         startLevel(0);
@@ -91,8 +107,11 @@ document.onkeypress = function(evt) {
 
 function startLevel(id) {
     currentState = PLAYING;
+    floaters = [];
+    currentFloater = undefined;
     remainingStrings = levels[id].strings.split(';');
-    startString(remainingStrings.shift());
+    spawnFloater();
+    startFloater(floaters[0]);
 }
 
 function startLoop() {
@@ -103,20 +122,38 @@ function win() {
     currentState = WON;
 }
 
+function calcX(floater) {
+    const deltaTime = (new Date().getTime() - floater.spawned.getTime()) / 1000;
+    const progress = Math.min(deltaTime / 2, 1);
+    //const spaceToTravel = x.measureText(floater.string).width;
+    return 240 - (progress * 200);
+}
+
 function act() {
-    x.fillStyle = '#000';
+    x.fillStyle = '#222';
     x.fillRect(0,0,240,160);
     if (currentState === PLAYING) {
-        x.fillStyle = '#fff';
-        x.fillText(currentString, 100, 100);
-        x.fillStyle = '#0f0';
-        x.fillText(currentString.substr(0, curPos), 100, 100);
+        floaters.forEach((floater, i) => {
+            x.fillStyle = '#fff';
+            x.fillText(floater.string, calcX(floater), 15 * i + 20);
+            if (floater === currentFloater) {
+                x.fillStyle = '#0f0';
+                x.fillText(floater.string.substr(0, curPos), calcX(floater), 15 * i + 20);
+            }
+        });
     }
+    //x.translate(Math.random(), Math.random());
+    // player
+    x.fillStyle = '#060';
+    x.fillRect(10, 120, 32, 32);
+    // monster
+    x.fillStyle = '#600';
+    x.fillRect(200, 80, 100, 70);
     if (currentState === WON) {
         x.fillStyle = '#ff0';
-        x.fillText('The city is save... for now.', 50, 50);
-        x.fillText('Press 1, 2 or 3 to start a level.', 50, 70);
-        x.fillText('Press 4 for the debug level.', 50, 90);
+        x.fillText('The city is save... for now.', 20, 50);
+        x.fillText('Press 1, 2 or 3 to start a level.', 20, 70);
+        x.fillText('Press 4 for the debug level.', 20, 90);
     }
 }
 
@@ -126,3 +163,5 @@ function init() {
 }
 
 init();
+
+x.font = '10px monospace';
