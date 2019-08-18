@@ -1,5 +1,5 @@
 # We fight back
-A apocalyptic typing game created for JS13kGames 2019. Correctly typing the displayed words will fight off the monster invading your town.
+An apocalyptic typing game created for JS13kGames 2019. Correctly typing the displayed words will fight off the monster invading your town.
 
 Play here: https://jaller94.gitlab.io/we-fight-back/
 
