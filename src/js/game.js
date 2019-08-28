@@ -67,36 +67,27 @@ const levels = [
 
 class TextTyper {
     constructor(stringList) {
-        this.remainingStrings = stringList.split(';');
+        this.strings = stringList.split(';');
         this.floaters = [];
         this.currentPosition = 0;
-        this.currentFloater;
+        this.currentFloater = 0;
+        this.wheelPosition = 0;
     }
 
     onKeyPress(key) {
-        const currentString = this.currentFloater.string;
+        const currentString = this.strings[this.currentFloater];
         const expected = currentString.substr(this.currentPosition, 1).toLowerCase();
         if (key.toLowerCase() == expected) {
             this.currentPosition++;
             if (this.wordDone()) {
-                this.floaters.shift();
-                this._spawnFloater();
                 if (this.sequenceDone()) {
                     win();
                 } else {
-                    this._startFloater(this.floaters[0]);
+                    this.currentFloater++;
+                    this.currentPosition = 0;
                 }
             }
         }
-    }
-
-    _spawnFloater() {
-        if (this.floaters.length > 5) return;
-        if (this.remainingStrings.length == 0) return;
-        this.floaters.push({
-            spawned: new Date(),
-            string: this.remainingStrings.shift(),
-        });
     }
 
     _startFloater(floater) {
@@ -105,36 +96,44 @@ class TextTyper {
     }
 
     wordDone() {
-        return this.currentPosition == this.currentFloater.string.length;
+        return this.currentPosition == this.strings[this.currentFloater].length;
     }
 
     sequenceDone() {
-        return (this.remainingStrings == 0) && (this.floaters.length == 0);
+        return this.currentFloater == this.strings.length -1 && this.wordDone();
     }
 
     start() {
-        this._spawnFloater();
-        this._startFloater(this.floaters[0]);
+        this.wheelPosition = 0;
+    }
+
+    act(delta) {
+        if (this.wheelPosition < this.currentFloater) {
+            this.wheelPosition = Math.min(this.wheelPosition + 2*delta, this.currentFloater);
+        }
     }
 
     draw(ctx) {
-        this.floaters.forEach((floater, i) => {
-            const x = calcX(floater)
-            const y = 15 * i + 20;
-            if (floater === this.currentFloater) {
+        for (let i = Math.floor(this.wheelPosition - 2); i < Math.floor(this.wheelPosition + 4); i++) {
+            if (i < 0 || i >= this.strings.length) continue;
+            const string = this.strings[i];
+            console.log(this.wheelPosition);
+            const x = 10;
+            const y = 15 * (i - this.wheelPosition) + 20;
+            if (i === this.currentFloater) {
                 ctx.fillStyle = '#000';
                 const margin = 5;
-                ctx.fillRect(x - margin, y - margin, ctx.measureText(floater.string).width + 2 * margin, FONT_HEIGHT + 2 * margin);
+                ctx.fillRect(x - margin, y - margin, ctx.measureText(string).width + 2 * margin, FONT_HEIGHT + 2 * margin);
                 ctx.fillStyle = '#fff';
             } else {
                 ctx.fillStyle = '#000';
             }
-            ctx.fillText(floater.string, x, y + FONT_HEIGHT);
-            if (floater === this.currentFloater) {
+            ctx.fillText(string, x, y + FONT_HEIGHT);
+            if (i === this.currentFloater) {
                 ctx.fillStyle = '#0f0';
-                ctx.fillText(floater.string.substr(0, this.currentPosition), x, y + FONT_HEIGHT);
+                ctx.fillText(string.substr(0, this.currentPosition), x, y + FONT_HEIGHT);
             }
-        });
+        }
     }
 }
 
@@ -161,9 +160,6 @@ document.onkeypress = function(evt) {
     }
     if (evt.key == 4) {
         startLevel(3);
-    }
-    if (evt.key == 5) {
-        textTyper.spawnFloater();
     }
     if (evt.key == 9) {
         meters+=8;
@@ -203,13 +199,11 @@ let meters = 0;
 
 function act() {
     meters++;
+    if (textTyper) textTyper.act(0.016);
 }
 
 function draw() {
     x.clearRect(0,0,240,160);
-    if (currentState == PLAYING) {
-        textTyper.draw(x);
-    }
 
     // buildings
     x.fillStyle = '#eee';
@@ -232,6 +226,10 @@ function draw() {
 
     x.fillStyle = '#000';
     x.fillRect(-64, 150, 512, 64);
+
+    if (currentState == PLAYING) {
+        textTyper.draw(x);
+    }
 
     if (currentState == WON) {
         x.fillStyle = '#000';
