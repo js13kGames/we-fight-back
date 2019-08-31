@@ -126,7 +126,6 @@ class TextTyper {
         for (let i = Math.floor(this.wheelPosition - 2); i < Math.floor(this.wheelPosition + 4); i++) {
             if (i < 0 || i >= this.strings.length) continue;
             const string = this.strings[i];
-            console.log(this.wheelPosition);
             const x = 10;
             const y = 15 * (i - this.wheelPosition) + 20;
             if (i === this.currentFloater) {
@@ -135,7 +134,9 @@ class TextTyper {
                 ctx.fillRect(x - margin, y - margin, ctx.measureText(string).width + 2 * margin, FONT_HEIGHT + 2 * margin);
                 ctx.fillStyle = '#fff';
             } else {
-                ctx.fillStyle = '#000';
+                const distance = Math.abs(this.wheelPosition - i);
+                const transparency = 1 - (Math.min(distance/3, 1));
+                ctx.fillStyle = `rgba(0,0,0,${transparency})`;
             }
             ctx.fillText(string, x, y + FONT_HEIGHT);
             if (i === this.currentFloater) {
