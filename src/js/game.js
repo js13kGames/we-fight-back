@@ -41,29 +41,33 @@ const levels = [
         strings: 'incoming monster;fighting heroes;final frontier;combined efforts;total apocalypse;giant creatures;no questions;find vulnerability;not ready;need ammo;breached barrier;hurt monstrosity;damaged planet;seeks revenge;endless fight;everlasting battle;lost friends;forgotten tears;but whatever comes;we fight back',
     },
     {
-        strings: 'We are the heroes.;We fight off monsters.;The city is protected by us.;Our scientists extracted dangerous gene mutations from wild creatures.;The industrial trash caused modifications to life forms on earth.;They will kill us all.;Watch your back.;Can you image the destruction that follows each attack?;Human society was harvesting resources beyond what mother earth could provide.;The unbalanced ecosystem became uncontrollable for surviving tribes.;Cleaning up the mistakes of former generations is certainly impossible at this point.But whatever happens,;we fight back!'
+        strings: 'We are the heroes.;We fight off monsters.;The city is protected by us.;Our scientists extracted their genes;and found dangerous mutations;They are wild creatures.;The industrial trash caused;modifications to life forms;on earth.;They will kill us all.;Watch your back.;Can you image the destruction;that follows each attack?;Human society was harvesting;resources beyond what mother;earth could provide.;The unbalanced ecosystem became;uncontrollable for surviving;tribes.;Cleaning up the mistakes;of former generations is;certainly impossible;at this point.;But whatever happens,;we fight back!'
     },
     {
         strings: 'Test',
     },
 ];
 
-// const au = new AudioContext();
-// const G = au.createGain();
-// const D = [15];
-// for(let i in D) {
-//     const o = au.createOscillator();
-//     o.type='sawtooth';
-//     if(D[i]) {
-//         o.connect(G);
-//         G.connect(au.destination);
-//         o.start(i*.01);
-//         o.frequency.setValueAtTime(440*1.06**(13-D[i]),i*.5);
-//         G.gain.setValueAtTime(1,i*.01);
-//         G.gain.setTargetAtTime(.1,0.0,0.2);
-//         o.stop(i*.1+.09);
-//     }
-// }
+function play(notes, type='square', speed=0.1) {
+    const au = new AudioContext();
+    const G = au.createGain();
+    for(let i in notes) {
+        const o = au.createOscillator();
+        o.type=type;
+        if(notes[i]) {
+            o.connect(G);
+            G.connect(au.destination);
+            o.start(i*speed);
+            o.frequency.setValueAtTime(440*1.06**(13-notes[i]),i*speed);
+            G.gain.setValueAtTime(1,i*speed);
+            G.gain.setTargetAtTime(.0001,i*speed+(speed-.02),.005);
+            o.stop(i*speed+(speed-.01));
+        }
+    }
+    return au;
+}
+
+play([12,,,12,,12,15,,12,,,12,,15,14,12,11,,,11,,11,11,,8,,,8,,8,10,11].map(v => v !== undefined ? v + 25 : undefined), 'sawtooth', .2);
 
 class TextTyper {
     constructor(stringList) {
@@ -80,13 +84,18 @@ class TextTyper {
         if (key.toLowerCase() == expected) {
             this.currentPosition++;
             if (this.wordDone()) {
+                play([5,9,8,6]);
                 if (this.sequenceDone()) {
                     win();
                 } else {
                     this.currentFloater++;
                     this.currentPosition = 0;
                 }
+            } else {
+                play([5], 'sawtooth');//Math.random() >= 0.5 ? [5] : [4], 'sawtooth');
             }
+        } else {
+            play([30]);
         }
     }
 
@@ -160,6 +169,11 @@ document.onkeypress = function(evt) {
     }
     if (evt.key == 4) {
         startLevel(3);
+    }
+    if (evt.key == 5) {
+        play([7,,12,,7,,12,,7,,12,,7,,12,,9,,14,,9,,14,,9,,14,,9,,14,,7,,14,,9,,12,,14,,7,,7]);
+        //play([22,,20,,22,,20,,22,,20,,22,,20,,25,,23,,25,,23,,25,,23,,25,,23], 'sawtooth');
+        console.log('start');
     }
     if (evt.key == 9) {
         meters+=8;
