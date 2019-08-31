@@ -178,7 +178,7 @@ document.onkeypress = function(evt) {
     if (evt.key == 9) {
         meters+=8;
     }
-    if (evt.key == 0) {
+    if (evt.key == '0') {
         meters-=8;
         console.log(meters);
     }
