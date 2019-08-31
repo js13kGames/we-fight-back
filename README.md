@@ -20,6 +20,9 @@ feel free to contact me at:
 https://gitlab.com/jaller94  
 http://chrpaul.de
 
+#### Graphics
+* T-Rex: CC-BY 3.0 https://opengameart.org/content/fossil-undead-rpg-enemy-sprites
+
 ### License
 Released under the AGPL 3.0 or later license.  
 See LICENSE file for more information.
