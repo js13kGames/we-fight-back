@@ -33,6 +33,14 @@ window.onblur = function() {
     blurred = true;
 }
 
+import monsterImagePath from '../images/rex_black.png';
+import truckImagePath from '../images/truck.png';
+
+const monsterImage = new Image();
+monsterImage.src = monsterImagePath;
+const truckImage = new Image();
+truckImage.src = truckImagePath;
+
 const levels = [
     {
         strings: 'monster;hero;shoot;kill;save;family;help;quick;gun;home;protect;earth;child;love;nature;ego;lost;fight;tears;trash;pollution;revenge;catastrophe;chaos;last;chance;WE;FIGHT;BACK',
@@ -64,12 +72,24 @@ function play(notes, type='square', speed=0.1) {
             o.stop(i*speed+(speed-.01));
         }
     }
+    setTimeout(() => {
+        au.close();
+    }, (notes.length) * speed* 1000);
     return au;
 }
 
+function playMusic() {
+    play([16,,,16,,16,13,,16,,,16,,13,14,16,17,,,17,,17,17,,20,,,20,,20,18,17], 'sawtooth', .2);
+    const au = play([16,16,16,16,16,16,13,14,16,16,16,16,16,13,14,16,17,17,17,17,17,17,17,18,20,20,20,20,20,20,18,17], 'square', .2);
+    au.onstatechange = function() {
+        if (au.state === 'closed') {
+            playMusic();
+        }
+        console.log(au.state);
+    }
+}
 //play([12,,,12,,12,15,,12,,,12,,15,14,12,11,,,11,,11,11,,8,,,8,,8,10,11].map(v => v !== undefined ? v + 25 : undefined), 'sawtooth', .2);
-play([16,,,16,,16,13,,16,,,16,,13,14,16,17,,,17,,17,17,,20,,,20,,20,18,17], 'sawtooth', .2);
-play([16,16,16,16,16,16,13,14,16,16,16,16,16,13,14,16,17,17,17,17,17,17,17,18,20,20,20,20,20,20,18,17], 'square', .2);
+//playMusic();
 
 class TextTyper {
     constructor(stringList) {
@@ -236,10 +256,12 @@ function draw() {
     //x.translate(Math.random(), Math.random());
     // player
     x.fillStyle = '#080';
-    x.fillRect(10, 120, 48, 32);
+    x.drawImage(truckImage, 10, 136);
+    //x.fillRect(10, 120, 48, 32);
     // monster
     x.fillStyle = '#800';
-    x.fillRect(200, 80, 100, 70);
+    x.drawImage(monsterImage, 200, 96);
+    //x.fillRect(200, 80, 100, 70);
 
     x.fillStyle = '#000';
     x.fillRect(-64, 150, 512, 64);
