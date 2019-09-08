@@ -16,3 +16,5 @@ export const levels = [
         strings: 'Test',
     },
 ];
+
+export const FONT_HEIGHT = 10;
