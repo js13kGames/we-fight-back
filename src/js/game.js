@@ -31,10 +31,11 @@ window.onblur = function() {
     blurred = true;
 }
 
-window.onblur = function() {
+window.onfocus = function() {
     //sequence1.gain.gain.value = 0;
     //sequence2.gain.gain.value = 0;
     blurred = false;
+    window.requestAnimationFrame(draw);
 }
 
 import monsterImagePath from '../images/rex_black.png';
