@@ -20,16 +20,15 @@ class TextTyper {
         if (key.toLowerCase() == expected) {
             this.currentPosition++;
             if (this.wordDone()) {
-                playMelodyOnce([5,9,8,6]);
+                playMelodyOnce([,9,8,6]);
                 if (!this.sequenceDone()) {
                     this.currentFloater++;
                     this.currentPosition = 0;
                 }
-            } else {
-                playMelodyOnce([5], 'sawtooth');
             }
+            return true;
         } else {
-            playMelodyOnce([30]);
+            return false;
         }
     }
 

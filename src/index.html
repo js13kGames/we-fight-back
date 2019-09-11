@@ -9,15 +9,6 @@
                 from { background-position: 0 0; }
                 to { background-position: 100% 0; }
             }
-            #street {
-                position:fixed;height:100%;top:49.9%;left:49.9%;transform:translateX(-50%)translateY(-50%);
-                background:url('./images/street.png');
-                height: 80px;
-                width: 100%;
-                background-size: 30px 15px;
-                transform: rotateX(50deg);
-                animation: animatedBackground 4s linear infinite;
-            }
             .l {
                 position:fixed;
                 width: 100%;
@@ -33,7 +24,6 @@
     </head>
     <body>
         <canvas id=bg class=l width=240 height=160></canvas>
-        <!-- <div id=street></div> -->
         <canvas id=fg class=l width=240 height=160></canvas>
         <script src="js/game.js"></script>
     </body>

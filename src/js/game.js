@@ -19,7 +19,14 @@ Thank you for playing!
 
 'use strict';
 
+// ZzFXmicro - Zuper Zmall Zound Zynth - MIT License - Copyright 2019 Frank Force
+const zzfx_v=.5;
+const zzfx_x=new AudioContext;
+const ZZFX=(e,f,a,b=1,d=.1,g=0,h=0,k=0,l=0)=>{let S=44100,P=Math.PI;a*=2*P/S;a*=1+f*(2*Math.random()-1);g*=1E3*P/(S**2);b=0<b?S*(10<b?10:b)|0:1;d*=b|0;k*=2*P/S;l*=P;f=[];for(var m=0,n=0,c=0;c<b;++c)f[c]=e*zzfx_v*Math.cos(m*a*Math.cos(n*k+l))*(c<d?c/d:1-(c-d)/(b-d)),m+=1+h*(2*Math.random()-1),n+=1+h*(2*Math.random()-1),a+=g;e=zzfx_x.createBuffer(1,b,S);a=zzfx_x.createBufferSource();e.getChannelData(0).set(f);a.buffer=e;a.connect(zzfx_x.destination);a.start();return a}
+
+
 const MENU = 3;
+const SHOUT_MONSTER = 5;
 const PLAYING = 2;
 const LOST = 1;
 const WON = 0;
@@ -39,13 +46,17 @@ window.onfocus = function() {
 }
 
 import monsterImagePath from '../images/rex_black.png';
+import monsterRunningImagePath from '../images/rex_running_v1.png';
 import truckImagePath from '../images/truck.png';
 
 import {playMelodyOnce} from './music.js';
 import TextTyper from './text-typer.js';
+import BulletModule from './bullet-module.js';
 
 const monsterImage = new Image();
 monsterImage.src = monsterImagePath;
+const monsterRunningImage = new Image();
+monsterRunningImage.src = monsterRunningImagePath;
 const truckImage = new Image();
 truckImage.src = truckImagePath;
 
@@ -75,15 +86,25 @@ const b = document.getElementById('bg');
 const x = a.getContext('2d');
 x.imageSmoothingEnabled = false;
 
+let timeOfLastTick = new Date().getTime();
+let timeOfStateStart = timeOfLastTick;
+
 let interval;
 let currentState;
+let monsterSoundPlayed;
+let showShoutMonster;
+let showSpaceHint;
+let shootingSince;
+const bulletModule = new BulletModule();
 let textTyper;
+let textTyperMonster;
 let goal;
 let meters;
 let kPH;
 
 const maxSpeed = 70;
-const shots = [];
+let shots = [];
+let particles = [];
 
 document.onkeypress = function(evt) {
     evt = evt || window.event;
@@ -102,36 +123,78 @@ document.onkeypress = function(evt) {
     if (evt.key == 5) {
         playMelodyOnce([7,,12,,7,,12,,7,,12,,7,,12,,9,,14,,9,,14,,9,,14,,9,,14,,7,,14,,9,,12,,14,,7,,7]);
         //playMelodyOnce([22,,20,,22,,20,,22,,20,,22,,20,,25,,23,,25,,23,,25,,23,,25,,23], 'sawtooth');
-        console.log('start');
     }
     if (evt.key == 9) {
         meters+=8;
     }
     if (evt.key == '0') {
         meters-=8;
-        console.log(meters);
     }
-    if (currentState == PLAYING) {
-        textTyper.onKeyPress(evt.key);
+    if (/[a-z\.!? ]/i.test(evt.key)) {
+        if (currentState == SHOUT_MONSTER) {
+            const correct = textTyperMonster.onKeyPress(evt.key);
+            if (correct) {
+                playMelodyOnce([5], 'sawtooth');
+            } else {
+                playMelodyOnce([30]);
+            }
+        }
+        if (currentState == PLAYING) {
+            const correct = textTyper.onKeyPress(evt.key);
+            if (correct) {
+                playMelodyOnce([5], 'sawtooth');
+                carFireShot();
+            } else {
+                playMelodyOnce([30]);
+            }
+        }
     }
 };
 
+window.addEventListener('keypress', (event) => {
+    if (event.key != 8) return;
+    carFireShot();
+    //playMelodyOnce([4]);
+});
+
+function carFireShot() {
+    bulletModule.fire({
+        origin: [30, 138],
+        target: [20 + 180 * ((goal - meters) / goal) + randomInt(5, 25), 138 + randomInt(-25, 15)],
+    });
+    //ZZFX(74201);
+    //ZZFX(53947);
+    //ZZFX(1,.1,1571,.1,0,0,4.7,.2,.8); // ZzFX 1671 (edited)
+    //ZZFX(1,.1,810,.1,.02,1.1,4.3,.4,.94); // ZzFX 74201
+    ZZFX(1,.1,1454,.1,.02,7.7,3.8,0,.84); // ZzFX 53947
+}
+
+function changeState(state) {
+    currentState = state;
+    timeOfStateStart = new Date().getTime();
+}
+
 function startLevel(id) {
-    currentState = PLAYING;
+    changeState(SHOUT_MONSTER);
     const level = levels[id];
 
     // Reset the progress
+    showShoutMonster = false;
+    showSpaceHint = false;
+    monsterSoundPlayed = false;
     kPH = 0;
     meters = 0;
     goal = level.goal;
 
     // Initialize the text module with the level's strings
+    textTyperMonster = new TextTyper(level.warning);
+    textTyperMonster.start();
     textTyper = new TextTyper(level.strings);
     textTyper.start();
 }
 
 function startLoop() {
-    interval = setInterval(act, 16);
+    interval = setInterval(callAct, 16);
     window.requestAnimationFrame(draw);
 }
 
@@ -145,7 +208,7 @@ const createBuilding = () => ({
 });
 
 const buildings = [];
-for (var i = 0; i < 20; i++) {
+for (let i = 0; i < 20; i++) {
     buildings.push(createBuilding());
 }
 
@@ -172,10 +235,28 @@ class SkyTrain {
 
 const skyTrain = new SkyTrain();
 
-function drawWorld(ctx) {
+function drawBackground(ctx) {
     ctx.save();
     ctx.translate((meters/2) + -50, 150);
     skyTrain.draw(ctx);
+    ctx.restore();
+
+    ctx.fillStyle = '#aaa';
+    ctx.save();
+    ctx.translate(Math.floor((meters/16) + 30), 150);
+    let region = new Path2D();
+    region.moveTo(4, 0);
+    region.lineTo(1, -112);
+    region.lineTo(0, -112);
+    region.lineTo(-4, 0);
+    region.closePath();
+    ctx.fill(region);
+    ctx.beginPath();
+    ctx.arc(0, -70, 7, 7, 0, 4);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.rect(-3, -86, 6, 10);
+    ctx.fill();
     ctx.restore();
 
     buildings.forEach((building, i) => {
@@ -212,33 +293,50 @@ function drawStepRoof() {
     }
 }
 
-function fireShot() {
-}
-
 function win() {
-    currentState = WON;
+    changeState(WON);
 }
 
 function lose() {
-    currentState = LOST;
+    changeState(LOST);
 }
 
-function calcX(floater) {
-    const deltaTime = (new Date().getTime() - floater.spawned.getTime()) / 1000;
-    const progress = Math.min(deltaTime / 2, 1);
-    //const spaceToTravel = x.measureText(floater.string).width;
-    return 240 - (progress * 200);
+function getStateTime(currentTime) {
+    currentTime = currentTime || new Date().getTime();
+    return (currentTime - timeOfStateStart) / 1000;
 }
 
-function act() {
+function callAct() {
+    const currentTime = new Date().getTime();
+    const deltaTime = (currentTime - timeOfLastTick) / 1000;
+    const stateTime = getStateTime(currentTime);
+    act(deltaTime, stateTime);
+    timeOfLastTick = currentTime;
+}
+
+function act(deltaTime, stateTime) {
     if (blurred) return;
-    const deltaTime = .016;
+
+    if (currentState == SHOUT_MONSTER) {
+        if (stateTime > 0.2 && !monsterSoundPlayed) {
+            ZZFX(4,.1,2000,3,.53,-1,3.9,0,.6); // ZzFX 99184
+            monsterSoundPlayed = true;
+        }
+        if (stateTime > 2 && !showShoutMonster) {
+            showShoutMonster = true;
+        }
+        if (textTyperMonster.sequenceDone()) {
+            changeState(PLAYING);
+            ZZFX(4,.1,2000,3,.53,-1,3.9,0,.6); // ZzFX 99184
+        };
+        textTyperMonster.act(deltaTime);
+    }
 
     if (currentState == PLAYING) {
-        if (textTyper) {
-            if (textTyper.sequenceDone()) win();
-            textTyper.act(deltaTime);
-        }
+        if (textTyper.sequenceDone()) win();
+        textTyper.act(deltaTime);
+    }
+    if (currentState == PLAYING) {
         kPH = Math.min(kPH + 20 * deltaTime, maxSpeed);
         meters += kPH / 3.6 * deltaTime;
         if (meters >= goal) lose();
@@ -250,32 +348,32 @@ function draw() {
     x.clearRect(0,0,240,160);
 
     // buildings
-    drawWorld(x);
+    drawBackground(x);
 
-    for (let i = 0; i < 100; i++) {
-    //    x.fillRect((meters - i * 320 + 1024) / 8, 86, 32, 64);
-    }
-
-    x.fillStyle = '#ddd';
-    for (let i = 0; i < 500; i++) {
-    //    x.fillRect((meters - i * 320 + 1024) / 4, 48, 32, 128);
-    }
-
-    //x.translate(Math.random(), Math.random());
     // player
     x.drawImage(truckImage, 10, 136);
-    //x.fillStyle = '#080';
-    //x.fillRect(10, 120, 48, 32);
-    // monster
-    x.drawImage(monsterImage, 20 + 180 * ((goal - meters) / goal), 96);
-    //x.fillStyle = '#800';
-    //x.fillRect(200, 80, 100, 70);
 
-    // Todo: Finish shooting animation
-    shots.forEach((shot) => {
-        x.fillStyle = '#ff0';
-        x.fillRect(10, 120, 48, 32);
-    });
+    // monster
+    if (currentState == SHOUT_MONSTER) {
+        const animationProgress = Math.min(getStateTime() / 2, 1);
+        x.drawImage(monsterImage, 240 - 40 * animationProgress, 96);
+        if (showShoutMonster) {
+            x.fillStyle = '#000';
+            x.fillText('Type to warn your city!!!', 50, 50);
+            textTyperMonster.draw(x);
+        }
+    }
+    if (currentState == PLAYING) {
+        if (kPH > 45) {
+            const FRAME_WIDTH = 96;
+            const img = Math.floor(meters / 2) % 4;
+            x.drawImage(monsterRunningImage, img * FRAME_WIDTH, 0, FRAME_WIDTH, 56, 20 + 180 * ((goal - meters) / goal), 96, 96, 56);
+        } else {
+            x.drawImage(monsterImage, 20 + 180 * ((goal - meters) / goal), 96);
+        }
+    }
+
+    bulletModule.draw(x);
 
     x.fillStyle = '#000';
     x.fillRect(-64, 150, 512, 64);
