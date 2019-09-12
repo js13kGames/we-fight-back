@@ -2,14 +2,16 @@ import {
     FONT_HEIGHT,
 } from './constants.js';
 
-import {playMelodyOnce} from './music.js';
+import {playMelodyOnce} from './audio.js';
 
 class TextTyper {
     constructor(stringList) {
         this.strings = stringList.split(';');
-        this.floaters = [];
+        // Position inside of the current floater
         this.currentPosition = 0;
+        // The index of the string to type
         this.currentFloater = 0;
+        // The progress of the animation (2 = focus on string 2)
         this.wheelPosition = 0;
     }
 
@@ -42,7 +44,11 @@ class TextTyper {
     }
 
     sequenceDone() {
-        return this.currentFloater == this.strings.length -1 && this.wordDone();
+        return this.currentFloater == this.strings.length - 1 && this.wordDone();
+    }
+
+    stringsLeft() {
+        return this.strings.length - this.currentFloater;
     }
 
     start() {

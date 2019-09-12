@@ -19,42 +19,40 @@ Thank you for playing!
 
 'use strict';
 
-// ZzFXmicro - Zuper Zmall Zound Zynth - MIT License - Copyright 2019 Frank Force
-const zzfx_v=.5;
-const zzfx_x=new AudioContext;
-const ZZFX=(e,f,a,b=1,d=.1,g=0,h=0,k=0,l=0)=>{let S=44100,P=Math.PI;a*=2*P/S;a*=1+f*(2*Math.random()-1);g*=1E3*P/(S**2);b=0<b?S*(10<b?10:b)|0:1;d*=b|0;k*=2*P/S;l*=P;f=[];for(var m=0,n=0,c=0;c<b;++c)f[c]=e*zzfx_v*Math.cos(m*a*Math.cos(n*k+l))*(c<d?c/d:1-(c-d)/(b-d)),m+=1+h*(2*Math.random()-1),n+=1+h*(2*Math.random()-1),a+=g;e=zzfx_x.createBuffer(1,b,S);a=zzfx_x.createBufferSource();e.getChannelData(0).set(f);a.buffer=e;a.connect(zzfx_x.destination);a.start();return a}
-
-
 const MENU = 3;
 const SHOUT_MONSTER = 5;
 const PLAYING = 2;
 const LOST = 1;
+const LOST_STATS = 6;
 const WON = 0;
 
 let blurred = false;
 window.onblur = function() {
-    //sequence1.gain.gain.value = 0;
-    //sequence2.gain.gain.value = 0;
     blurred = true;
 }
 
 window.onfocus = function() {
-    //sequence1.gain.gain.value = 0;
-    //sequence2.gain.gain.value = 0;
     blurred = false;
     window.requestAnimationFrame(draw);
 }
 
 import monsterImagePath from '../images/rex_black.png';
-import monsterRunningImagePath from '../images/rex_running_v1.png';
+import monsterDeadImagePath from '../images/rex_dead.png';
+import monsterRunningImagePath from '../images/rex_running.png';
 import truckImagePath from '../images/truck.png';
 
-import {playMelodyOnce} from './music.js';
+import {
+    playMelodyOnce,
+    playMonsterShout,
+    ZZFX,
+} from './audio.js';
 import TextTyper from './text-typer.js';
 import BulletModule from './bullet-module.js';
 
 const monsterImage = new Image();
 monsterImage.src = monsterImagePath;
+const monsterDeadImage = new Image();
+monsterDeadImage.src = monsterDeadImagePath;
 const monsterRunningImage = new Image();
 monsterRunningImage.src = monsterRunningImagePath;
 const truckImage = new Image();
@@ -65,36 +63,18 @@ import {
     FONT_HEIGHT,
 } from './constants.js';
 
-function playMusic() {
-    // Rainbow Factory
-    playMelodyOnce([16,,,16,,16,13,,16,,,16,,13,14,16,17,,,17,,17,17,,20,,,20,,20,18,17], 'sawtooth', .2);
-    const au = playMelodyOnce([16,16,16,16,16,16,13,14,16,16,16,16,16,13,14,16,17,17,17,17,17,17,17,18,20,20,20,20,20,20,18,17], 'square', .2);
-    au.onstatechange = function() {
-        if (au.state === 'closed') {
-            playMusic();
-        }
-        console.log(au.state);
-    }
-}
-// Rainbow Factory flipped
-//playMelodyOnce([12,,,12,,12,15,,12,,,12,,15,14,12,11,,,11,,11,11,,8,,,8,,8,10,11].map(v => v !== undefined ? v + 25 : undefined), 'sawtooth', .2);
-//playMusic();
-
 const a = document.getElementById('fg');
-const b = document.getElementById('bg');
 
 const x = a.getContext('2d');
+x.font = `${FONT_HEIGHT}px monospace`;
 x.imageSmoothingEnabled = false;
 
 let timeOfLastTick = new Date().getTime();
 let timeOfStateStart = timeOfLastTick;
 
-let interval;
 let currentState;
 let monsterSoundPlayed;
 let showShoutMonster;
-let showSpaceHint;
-let shootingSince;
 const bulletModule = new BulletModule();
 let textTyper;
 let textTyperMonster;
@@ -102,50 +82,62 @@ let goal;
 let meters;
 let kPH;
 
+let winMeters;
+let deadMonsterPosition;
+let incorrectCharactersCount;
+let showHints;
+
 const maxSpeed = 70;
-let shots = [];
-let particles = [];
 
 document.onkeypress = function(evt) {
     evt = evt || window.event;
-    if (evt.key == 1) {
+    const key = evt.key == 'Spacebar' ? ' ' : evt.key; // for some older browsers
+    if (key == 1) {
         startLevel(0);
     }
-    if (evt.key == 2) {
+    if (key == 2) {
         startLevel(1);
     }
-    if (evt.key == 3) {
+    if (key == 3) {
         startLevel(2);
     }
-    if (evt.key == 4) {
+    if (key == 4) {
         startLevel(3);
     }
-    if (evt.key == 5) {
+    if (key == 5) {
         playMelodyOnce([7,,12,,7,,12,,7,,12,,7,,12,,9,,14,,9,,14,,9,,14,,9,,14,,7,,14,,9,,12,,14,,7,,7]);
         //playMelodyOnce([22,,20,,22,,20,,22,,20,,22,,20,,25,,23,,25,,23,,25,,23,,25,,23], 'sawtooth');
     }
-    if (evt.key == 9) {
+    if (key == 9) {
         meters+=8;
     }
-    if (evt.key == '0') {
+    if (key == '0') {
         meters-=8;
     }
-    if (/[a-z\.!? ]/i.test(evt.key)) {
+    if (key == ' ' && [WON, LOST, LOST_STATS].includes(currentState)) {
+        changeState(MENU);
+    }
+    if (key == 'h' && currentState == LOST) {
+        changeState(LOST_STATS);
+    }
+    if (/[a-z\.!? ]/i.test(key)) {
         if (currentState == SHOUT_MONSTER) {
-            const correct = textTyperMonster.onKeyPress(evt.key);
+            const correct = textTyperMonster.onKeyPress(key);
             if (correct) {
                 playMelodyOnce([5], 'sawtooth');
+                showShoutMonster = true;
             } else {
                 playMelodyOnce([30]);
             }
         }
         if (currentState == PLAYING) {
-            const correct = textTyper.onKeyPress(evt.key);
+            const correct = textTyper.onKeyPress(key);
             if (correct) {
                 playMelodyOnce([5], 'sawtooth');
                 carFireShot();
             } else {
                 playMelodyOnce([30]);
+                incorrectCharactersCount++;
             }
         }
     }
@@ -172,6 +164,8 @@ function carFireShot() {
 function changeState(state) {
     currentState = state;
     timeOfStateStart = new Date().getTime();
+    showHints = false;
+    console.log(getStateTime());
 }
 
 function startLevel(id) {
@@ -180,21 +174,22 @@ function startLevel(id) {
 
     // Reset the progress
     showShoutMonster = false;
-    showSpaceHint = false;
     monsterSoundPlayed = false;
     kPH = 0;
     meters = 0;
     goal = level.goal;
+    deadMonsterPosition = 0;
+    incorrectCharactersCount = 0;
 
     // Initialize the text module with the level's strings
     textTyperMonster = new TextTyper(level.warning);
     textTyperMonster.start();
     textTyper = new TextTyper(level.strings);
-    textTyper.start();
+    textTyper.wheelPosition = -2;
 }
 
 function startLoop() {
-    interval = setInterval(callAct, 16);
+    setInterval(callAct, 16);
     window.requestAnimationFrame(draw);
 }
 
@@ -266,7 +261,9 @@ function drawBackground(ctx) {
         ctx.restore();
     });
 
+    // street signs
     for (let i = 0; i < 300; i++) {
+        if (i % 8 != 0 && i % 8 != 1) continue;
         ctx.save();
         ctx.translate(meters*8 - i * 25, 150);
         ctx.fillStyle = '#000';
@@ -295,6 +292,8 @@ function drawStepRoof() {
 
 function win() {
     changeState(WON);
+    winMeters = goal - meters;
+    deadMonsterPosition = 20 + 180 * ((goal - meters) / goal);
 }
 
 function lose() {
@@ -319,27 +318,31 @@ function act(deltaTime, stateTime) {
 
     if (currentState == SHOUT_MONSTER) {
         if (stateTime > 0.2 && !monsterSoundPlayed) {
-            ZZFX(4,.1,2000,3,.53,-1,3.9,0,.6); // ZzFX 99184
             monsterSoundPlayed = true;
+            playMonsterShout();
         }
         if (stateTime > 2 && !showShoutMonster) {
             showShoutMonster = true;
         }
         if (textTyperMonster.sequenceDone()) {
             changeState(PLAYING);
-            ZZFX(4,.1,2000,3,.53,-1,3.9,0,.6); // ZzFX 99184
+            playMonsterShout();
         };
         textTyperMonster.act(deltaTime);
-    }
-
-    if (currentState == PLAYING) {
+    } else if (currentState == PLAYING) {
         if (textTyper.sequenceDone()) win();
         textTyper.act(deltaTime);
-    }
-    if (currentState == PLAYING) {
+
         kPH = Math.min(kPH + 20 * deltaTime, maxSpeed);
         meters += kPH / 3.6 * deltaTime;
         if (meters >= goal) lose();
+    } else if (currentState == WON) {
+        kPH = Math.max(kPH * .95, 0);
+        meters += kPH / 3.6 * deltaTime;
+    } else if (currentState == LOST) {
+        if (stateTime > 2 && !showHints) {
+            showHints = true;
+        }
     }
 }
 
@@ -362,8 +365,7 @@ function draw() {
             x.fillText('Type to warn your city!!!', 50, 50);
             textTyperMonster.draw(x);
         }
-    }
-    if (currentState == PLAYING) {
+    } else if (currentState == PLAYING) {
         if (kPH > 45) {
             const FRAME_WIDTH = 96;
             const img = Math.floor(meters / 2) % 4;
@@ -371,6 +373,8 @@ function draw() {
         } else {
             x.drawImage(monsterImage, 20 + 180 * ((goal - meters) / goal), 96);
         }
+    } else if (currentState == WON) {
+        x.drawImage(monsterDeadImage, deadMonsterPosition + (meters - winMeters), 96);
     }
 
     bulletModule.draw(x);
@@ -387,14 +391,30 @@ function draw() {
     if (currentState == WON) {
         x.fillStyle = '#000';
         x.fillText('The city is save... for now.', 20, 50);
-        x.fillText('Press 1, 2 or 3 to start a level.', 20, 70);
-        x.fillText('Press 4 for the debug level.', 20, 90);
+        x.fillText(`Meters to your base: ${winMeters.toFixed(1)}`, 20, 70);
+        x.fillText(`Incorrect characters: ${incorrectCharactersCount}`, 20, 90);
     }
     if (currentState == LOST) {
         x.fillStyle = '#000';
+        x.fillRect(0, 0, 240, 160);
+        x.fillStyle = '#a11';
         x.fillText('The monster reached your base.', 20, 50);
         x.fillText('You saw it kill some friends', 20, 70);
         x.fillText('... suddenly it was eying you.', 20, 90);
+        if (showHints) {
+            x.fillStyle = '#aaa';
+            x.fillText('Press H to reveal your progress', 20, 110);
+            x.fillText('Press Space to return', 20, 130);
+        }
+    }
+    if (currentState == LOST_STATS) {
+        x.fillStyle = '#000';
+        x.fillRect(0, 0, 240, 160);
+        x.fillStyle = '#a11';
+        x.fillText('There is an end!', 20, 50);
+        x.fillText(`Strings left: ${textTyper.stringsLeft()}`, 20, 70);
+        x.fillStyle = '#aaa';
+        x.fillText('Press Space to return', 20, 130);
     }
     if (currentState == MENU) {
         x.fillStyle = '#000';
@@ -413,5 +433,3 @@ function init() {
 }
 
 init();
-
-x.font = `${FONT_HEIGHT}px monospace`;
