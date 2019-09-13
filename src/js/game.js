@@ -28,9 +28,6 @@ const WON = 0;
 
 
 const DEBUG = false;
-//const isUserPaying = () => true;
-const isUserPaying = () => (document.monetization && document.monetization.state === 'started');
-
 
 let blurred = false;
 window.onblur = function() {
@@ -84,6 +81,14 @@ x.imageSmoothingEnabled = false;
 let timeOfLastTick = new Date().getTime();
 let timeOfStateStart = timeOfLastTick;
 
+// A way to
+let pirateTyper = new TextTyper('pirate');
+let isPirate = false;
+const isUserPaying = () => (
+    (document.monetization && document.monetization.state === 'started' )
+    || isPirate
+);
+
 let currentState;
 let monsterSoundPlayed;
 let showShoutMonster;
@@ -105,6 +110,28 @@ let wantsBerlin = false;
 
 const maxSpeed = 70;
 
+
+//helper
+
+function shuffleArray(array) {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
 document.onkeypress = function(evt) {
     evt = evt || window.event;
     const key = evt.key == 'Spacebar' ? ' ' : evt.key.toLowerCase(); // for some older browsers
@@ -121,6 +148,8 @@ document.onkeypress = function(evt) {
         if (key == 4) {
             startLevel(3);
         }
+        if (!pirateTyper.sequenceDone()) pirateTyper.onKeyPress(key);
+        if (pirateTyper.sequenceDone()) isPirate = true;
     }
     if (DEBUG) {
         if (key == 5) {
@@ -209,7 +238,9 @@ function startLevel(id) {
     // Initialize the text module with the level's strings
     textTyperMonster = new TextTyper(level.warning);
     textTyperMonster.start();
-    textTyper = new TextTyper(level.strings);
+    let strings = level.strings;
+    if (wantsShuffled) strings = shuffleArray(strings.split(';')).join(';');
+    textTyper = new TextTyper(strings);
     textTyper.wheelPosition = -2;
 }
 
