@@ -23,7 +23,8 @@ The extras for monetized subscribers are a mode where the texts of the story got
 * Elio from [ura.design](https://ura.design/) who provided me with design ideas.
 * Ebay and the arcade [GameOn in Berlin](https://gameon.events/) for hosting a js13k games meetup.
 * Andrzej for organizing the js13k each year and playing Initial D against me at said meetup.
-* Everyone who votes for my game, so I get a t-shirt. 👀
+* Everyone who votes for my game, so I get a t-shirt. 👍👀
+* Vancouver for being my home for the last two years and Berlin for being my new home.
 * My boss for hopefully being ok with me finishing a game at 5 AM on a weekday.
 
 ### Sound libraries
@@ -40,7 +41,7 @@ Furthermore, I loved creating this using:
 * Manjaro Linux
 * Firefox
 * Atom text editor
-* [Aesprite](https://mastodonten.de/@jaller94/102776442577034458)
+* [Aseprite](https://mastodonten.de/@jaller94/102776442577034458)
 * Inkscape
 * GNU Image Manipulation Program
 
