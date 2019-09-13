@@ -2,6 +2,10 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+import brandenburgerTorImagePath from '../images/brandenburger-tor.png';
+const brandenburgerTorImage = new Image();
+brandenburgerTorImage.src = brandenburgerTorImagePath;
+
 
 function drawTvTower(ctx, meters) {
     ctx.fillStyle = '#aaa';
@@ -39,10 +43,15 @@ function drawBerlin(ctx, meters) {
     drawTvTower(ctx);
     ctx.restore();
 
+    ctx.save();
+    ctx.translate(Math.floor((meters/2) - 100), 150);
+    ctx.drawImage(brandenburgerTorImage, 0, -brandenburgerTorImage.height);
+    ctx.restore();
+
     buildings.forEach((building, i) => {
         ctx.save();
         ctx.translate(meters - i * 105 + 70, 150);
-        drawBuilding(ctx, building);
+            drawBuilding(ctx, building);
         ctx.restore();
     });
 }

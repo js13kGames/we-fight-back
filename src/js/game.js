@@ -39,11 +39,6 @@ window.onfocus = function() {
     window.requestAnimationFrame(draw);
 }
 
-import monsterImagePath from '../images/rex_black.png';
-import monsterDeadImagePath from '../images/rex_dead.png';
-import monsterRunningImagePath from '../images/rex_running.png';
-import truckImagePath from '../images/truck.png';
-
 import {
     playMelodyOnce,
     playMonsterShout,
@@ -55,12 +50,20 @@ import BulletModule from './bullet-module.js';
 import drawBerlin from './berlin.js';
 import drawVancouver from './vancouver.js';
 
+
+import monsterImagePath from '../images/rex_black.png';
 const monsterImage = new Image();
 monsterImage.src = monsterImagePath;
+
+import monsterDeadImagePath from '../images/rex_dead.png';
 const monsterDeadImage = new Image();
 monsterDeadImage.src = monsterDeadImagePath;
+
+import monsterRunningImagePath from '../images/rex_running.png';
 const monsterRunningImage = new Image();
 monsterRunningImage.src = monsterRunningImagePath;
+
+import truckImagePath from '../images/truck.png';
 const truckImage = new Image();
 truckImage.src = truckImagePath;
 

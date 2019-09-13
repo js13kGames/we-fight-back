@@ -2,6 +2,9 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+import habourCentreImagePath from '../images/habour-centre.png';
+const habourCentreImage = new Image();
+habourCentreImage.src = habourCentreImagePath;
 
 const PILLAR_DISTANCE = 40;
 const PILLAR_HEIGHT = 20;
@@ -39,8 +42,13 @@ function drawStepRoof() {
 
 function drawVancouver(ctx, meters) {
     ctx.save();
-    ctx.translate((meters/2) + -50, 150);
+    ctx.translate((meters/2) + -300, 150);
     skyTrain.draw(ctx);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(Math.floor((meters/4) - 200), 150);
+    ctx.drawImage(habourCentreImage, 0, -habourCentreImage.height);
     ctx.restore();
 
     buildings.forEach((building, i) => {
