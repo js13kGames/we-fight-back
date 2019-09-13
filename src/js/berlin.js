@@ -2,6 +2,10 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+import berlinBorderImagePath from '../images/berlin-border.png';
+const berlinBorderImage = new Image();
+berlinBorderImage.src = berlinBorderImagePath;
+
 import brandenburgerTorImagePath from '../images/brandenburger-tor.png';
 const brandenburgerTorImage = new Image();
 brandenburgerTorImage.src = brandenburgerTorImagePath;
@@ -50,10 +54,29 @@ function drawBerlin(ctx, meters) {
 
     buildings.forEach((building, i) => {
         ctx.save();
-        ctx.translate(meters - i * 105 + 70, 150);
-            drawBuilding(ctx, building);
+        ctx.translate(meters - i * 105 + 20, 150);
+        drawBuilding(ctx, building);
         ctx.restore();
     });
+
+    // street lamps
+    for (let i = 0; i < 400; i++) {
+        ctx.save();
+        ctx.translate(meters*8 - i * 50, 150);
+        ctx.fillStyle = '#000';
+        // pole
+        ctx.fillRect(0, -19, 1, 20);
+        ctx.fillRect(-4, -18, 9, 1);
+        // lights
+        ctx.fillRect(-4, -20, 2, 3);
+        ctx.fillRect(3, -20, 2, 3);
+        ctx.restore();
+    }
+
+    ctx.save();
+    ctx.translate(meters*8 + 65, 150);
+    ctx.drawImage(berlinBorderImage, 0, -berlinBorderImage.height*1.5, berlinBorderImage.width*1.5, berlinBorderImage.height*1.5);
+    ctx.restore();
 }
 
 // init

@@ -2,6 +2,10 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+import vancouverBorderImagePath from '../images/vancouver-border.png';
+const vancouverBorderImage = new Image();
+vancouverBorderImage.src = vancouverBorderImagePath;
+
 import habourCentreImagePath from '../images/habour-centre.png';
 const habourCentreImage = new Image();
 habourCentreImage.src = habourCentreImagePath;
@@ -60,7 +64,7 @@ function drawVancouver(ctx, meters) {
 
     // street signs
     for (let i = 0; i < 800; i++) {
-        if (i % 8 != 0 && i % 8 != 1) continue;
+        if (i % 8 != 1 && i % 8 != 2) continue;
         ctx.save();
         ctx.translate(meters*8 - i * 25, 150);
         ctx.fillStyle = '#000';
@@ -70,6 +74,11 @@ function drawVancouver(ctx, meters) {
         ctx.fillRect(-2, -20, 5, 7);
         ctx.restore();
     }
+
+    ctx.save();
+    ctx.translate(meters*8 + 60, 150);
+    ctx.drawImage(vancouverBorderImage, 0, -vancouverBorderImage.height*1.5, vancouverBorderImage.width*1.5, vancouverBorderImage.height*1.5);
+    ctx.restore();
 }
 
 // init
