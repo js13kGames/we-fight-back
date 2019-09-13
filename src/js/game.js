@@ -26,6 +26,12 @@ const LOST = 1;
 const LOST_STATS = 6;
 const WON = 0;
 
+
+const DEBUG = false;
+//const isUserPaying = () => true;
+const isUserPaying = () => (document.monetization && document.monetization.state === 'started');
+
+
 let blurred = false;
 window.onblur = function() {
     blurred = true;
@@ -49,6 +55,9 @@ import {
 import TextTyper from './text-typer.js';
 import BulletModule from './bullet-module.js';
 
+import drawBerlin from './berlin.js';
+import drawVancouver from './vancouver.js';
+
 const monsterImage = new Image();
 monsterImage.src = monsterImagePath;
 const monsterDeadImage = new Image();
@@ -57,6 +66,9 @@ const monsterRunningImage = new Image();
 monsterRunningImage.src = monsterRunningImagePath;
 const truckImage = new Image();
 truckImage.src = truckImagePath;
+
+
+const checkbox = (checked) => checked ? 'on ' : 'off';
 
 import {
     levels,
@@ -79,7 +91,7 @@ const bulletModule = new BulletModule();
 let textTyper;
 let textTyperMonster;
 let goal;
-let meters;
+let meters = 0;
 let kPH;
 
 let winMeters;
@@ -87,32 +99,51 @@ let deadMonsterPosition;
 let incorrectCharactersCount;
 let showHints;
 
+// Web Monitization bonus
+let wantsShuffled = false;
+let wantsBerlin = false;
+
 const maxSpeed = 70;
 
 document.onkeypress = function(evt) {
     evt = evt || window.event;
-    const key = evt.key == 'Spacebar' ? ' ' : evt.key; // for some older browsers
-    if (key == 1) {
-        startLevel(0);
+    const key = evt.key == 'Spacebar' ? ' ' : evt.key.toLowerCase(); // for some older browsers
+    if (currentState == MENU || DEBUG) {
+        if (key == 1) {
+            startLevel(0);
+        }
+        if (key == 2) {
+            startLevel(1);
+        }
+        if (key == 3) {
+            startLevel(2);
+        }
+        if (key == 4) {
+            startLevel(3);
+        }
     }
-    if (key == 2) {
-        startLevel(1);
+    if (DEBUG) {
+        if (key == 5) {
+            playMelodyOnce([7,,12,,7,,12,,7,,12,,7,,12,,9,,14,,9,,14,,9,,14,,9,,14,,7,,14,,9,,12,,14,,7,,7]);
+            //playMelodyOnce([22,,20,,22,,20,,22,,20,,22,,20,,25,,23,,25,,23,,25,,23,,25,,23], 'sawtooth');
+        }
+        if (key == 8) {
+            carFireShot();
+        }
+        if (key == 9) {
+            meters+=8;
+        }
+        if (key == '0') {
+            meters-=8;
+        }
     }
-    if (key == 3) {
-        startLevel(2);
-    }
-    if (key == 4) {
-        startLevel(3);
-    }
-    if (key == 5) {
-        playMelodyOnce([7,,12,,7,,12,,7,,12,,7,,12,,9,,14,,9,,14,,9,,14,,9,,14,,7,,14,,9,,12,,14,,7,,7]);
-        //playMelodyOnce([22,,20,,22,,20,,22,,20,,22,,20,,25,,23,,25,,23,,25,,23,,25,,23], 'sawtooth');
-    }
-    if (key == 9) {
-        meters+=8;
-    }
-    if (key == '0') {
-        meters-=8;
+    if (isUserPaying() && currentState == MENU) {
+        if (key == 'b') {
+            wantsBerlin = !wantsBerlin;
+        }
+        if (key == 's') {
+            wantsShuffled = !wantsShuffled;
+        }
     }
     if (key == ' ' && [WON, LOST, LOST_STATS].includes(currentState)) {
         changeState(MENU);
@@ -143,16 +174,10 @@ document.onkeypress = function(evt) {
     }
 };
 
-window.addEventListener('keypress', (event) => {
-    if (event.key != 8) return;
-    carFireShot();
-    //playMelodyOnce([4]);
-});
-
 function carFireShot() {
     bulletModule.fire({
         origin: [30, 138],
-        target: [20 + 180 * ((goal - meters) / goal) + randomInt(5, 25), 138 + randomInt(-25, 15)],
+        target: [20 + 180 * ((goal - meters) / goal) + randomInt(5, 25), 138 + randomInt(-5, 5)],
     });
     //ZZFX(74201);
     //ZZFX(53947);
@@ -165,7 +190,7 @@ function changeState(state) {
     currentState = state;
     timeOfStateStart = new Date().getTime();
     showHints = false;
-    console.log(getStateTime());
+    if (state == MENU) meters = 0;
 }
 
 function startLevel(id) {
@@ -197,96 +222,11 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const createBuilding = () => ({
-    width: randomInt(35, 40),
-    height: randomInt(70, 100),
-});
-
-const buildings = [];
-for (let i = 0; i < 20; i++) {
-    buildings.push(createBuilding());
-}
-
-class SkyTrain {
-    constructor() {
-        this.train = 0;
-    }
-
-    act() {
-
-    }
-
-    draw(ctx) {
-        const length = 1000;
-        const PILLAR_DISTANCE = 40;
-        const PILLAR_HEIGHT = 20;
-        ctx.fillStyle = '#ddd';
-        ctx.fillRect(0, -PILLAR_HEIGHT - 3, length, 3);
-        for (let x = 0; x < length; x += PILLAR_DISTANCE) {
-            ctx.fillRect(x, -PILLAR_HEIGHT, 5, PILLAR_HEIGHT);
-        }
-    }
-}
-
-const skyTrain = new SkyTrain();
-
 function drawBackground(ctx) {
-    ctx.save();
-    ctx.translate((meters/2) + -50, 150);
-    skyTrain.draw(ctx);
-    ctx.restore();
-
-    ctx.fillStyle = '#aaa';
-    ctx.save();
-    ctx.translate(Math.floor((meters/16) + 30), 150);
-    let region = new Path2D();
-    region.moveTo(4, 0);
-    region.lineTo(1, -112);
-    region.lineTo(0, -112);
-    region.lineTo(-4, 0);
-    region.closePath();
-    ctx.fill(region);
-    ctx.beginPath();
-    ctx.arc(0, -70, 7, 7, 0, 4);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.rect(-3, -86, 6, 10);
-    ctx.fill();
-    ctx.restore();
-
-    buildings.forEach((building, i) => {
-        ctx.save();
-        ctx.translate(meters - i * 45, 150);
-        drawBuilding(ctx, building);
-        ctx.restore();
-    });
-
-    // street signs
-    for (let i = 0; i < 300; i++) {
-        if (i % 8 != 0 && i % 8 != 1) continue;
-        ctx.save();
-        ctx.translate(meters*8 - i * 25, 150);
-        ctx.fillStyle = '#000';
-        // pole
-        ctx.fillRect(0, -20, 1, 20);
-        // sign
-        ctx.fillRect(-2, -20, 5, 7);
-        ctx.restore();
-    }
-}
-
-function drawBuilding(ctx, {width, height}) {
-    ctx.fillStyle = '#888';
-    ctx.fillRect(2, 0, width - 2, -height);
-    for (let y = -6; y > -height; y-= 6) {
-        ctx.fillRect(0, y, 2, 1);
-    }
-}
-
-function drawStepRoof() {
-    ctx.fillRect(2, 0, width - 2, -height);
-    for (let y = -6; y > height; y-= 6) {
-        ctx.fillRect(0, y, 2, 1);
+    if (wantsBerlin) {
+        drawBerlin(ctx, meters);
+    } else {
+        drawVancouver(ctx, meters);
     }
 }
 
@@ -298,6 +238,7 @@ function win() {
 
 function lose() {
     changeState(LOST);
+    playMonsterShout();
 }
 
 function getStateTime(currentTime) {
@@ -339,6 +280,9 @@ function act(deltaTime, stateTime) {
     } else if (currentState == WON) {
         kPH = Math.max(kPH * .95, 0);
         meters += kPH / 3.6 * deltaTime;
+        if (stateTime > 2 && !showHints) {
+            showHints = true;
+        }
     } else if (currentState == LOST) {
         if (stateTime > 2 && !showHints) {
             showHints = true;
@@ -379,15 +323,18 @@ function draw() {
 
     bulletModule.draw(x);
 
+    // road at the bottom of the screen
     x.fillStyle = '#000';
     x.fillRect(-64, 150, 512, 64);
 
+    if (currentState == SHOUT_MONSTER || currentState == PLAYING) {
+        x.fillStyle = '#000';
+        const text = (goal - meters).toFixed(1).padStart(6);
+        x.fillText(`${text} m`, 190, 10);
+    }
     if (currentState == PLAYING) {
         textTyper.draw(x);
-        x.fillStyle = '#000';
-        x.fillText(`${(goal - meters).toFixed(1)} m`, 190, 10);
     }
-
     if (currentState == WON) {
         x.fillStyle = '#000';
         x.fillText('The city is save... for now.', 20, 50);
@@ -400,7 +347,7 @@ function draw() {
         x.fillStyle = '#a11';
         x.fillText('The monster reached your base.', 20, 50);
         x.fillText('You saw it kill some friends', 20, 70);
-        x.fillText('... suddenly it was eying you.', 20, 90);
+        x.fillText('... suddenly it was eyeing you.', 20, 90);
         if (showHints) {
             x.fillStyle = '#aaa';
             x.fillText('Press H to reveal your progress', 20, 110);
@@ -411,25 +358,29 @@ function draw() {
         x.fillStyle = '#000';
         x.fillRect(0, 0, 240, 160);
         x.fillStyle = '#a11';
-        x.fillText('There is an end!', 20, 50);
+        x.fillText('You can kill the monster!', 20, 50);
         x.fillText(`Strings left: ${textTyper.stringsLeft()}`, 20, 70);
         x.fillStyle = '#aaa';
         x.fillText('Press Space to return', 20, 130);
     }
     if (currentState == MENU) {
         x.fillStyle = '#000';
-        x.fillText('Pick your town', 20, 20);
-        x.fillText('1  Words', 20, 40);
-        x.fillText('2  Word pairs', 20, 60);
-        x.fillText('3  Sentences', 20, 80);
-        x.fillText('4  Debug', 20, 100);
+        x.fillText('We fight back', 80, 20);
+        x.fillText('Pick your town', 20, 40);
+        x.fillText('1  Words', 20, 60);
+        x.fillText('2  Word pairs', 20, 80);
+        x.fillText('3  Sentences', 20, 100);
+        if (DEBUG) x.fillText('4  Debug', 20, 120);
+        if (isUserPaying()) {
+            x.fillText('Bonus for Web', 140, 40);
+            x.fillText('Monitization', 140, 60);
+            x.fillText(`${checkbox(wantsShuffled)} (S)huffled`, 140, 80);
+            x.fillText(`${checkbox(wantsBerlin)} (B)erlin`, 140, 100);
+        }
     }
     window.requestAnimationFrame(draw);
 }
 
-function init() {
-    currentState = MENU;
-    startLoop();
-}
-
-init();
+// init
+currentState = MENU;
+startLoop();
