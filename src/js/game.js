@@ -366,7 +366,7 @@ function draw() {
     if (currentState == MENU) {
         x.fillStyle = '#000';
         x.fillText('We fight back', 80, 20);
-        x.fillText('Pick your town', 20, 40);
+        x.fillText('Press a number', 20, 40);
         x.fillText('1  Words', 20, 60);
         x.fillText('2  Word pairs', 20, 80);
         x.fillText('3  Sentences', 20, 100);
