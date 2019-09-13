@@ -12,7 +12,7 @@ export const levels = [
     {
         goal: 2000,
         warning: 'A MONSTER BREACHED THE BORDER!',
-        strings: 'We are the heroes.;We fight off monsters.;The city is protected by us.;Our scientists extracted their genes;and found dangerous mutations.;They are wild creatures.;The industrial trash caused;modifications to life forms;on earth.;They will kill us all.;Watch your back.;Can you image the destruction;that follows each attack?;Human society was harvesting;resources beyond what mother;earth could provide.;The unbalanced ecosystem became;uncontrollable for surviving;tribes.;Cleaning up the mistakes;of former generations is;certainly impossible;at this point.;But whatever happens,;we fight back!'
+        strings: 'We are the heroes.;We fight off monsters.;The city is protected by us.;Our scientists extracted their genes;and found dangerous mutations.;They are wild creatures.;The industrial trash caused;modifications to life forms;on earth.;They will kill us all.;Watch your back.;Can you imagine the destruction;that follows each attack?;Human society was harvesting;resources beyond what mother;earth could provide.;The unbalanced ecosystem became;uncontrollable for surviving;tribes.;Cleaning up the mistakes;of former generations is;certainly impossible;at this point.;But whatever happens,;we fight back!'
     },
     {
         goal: 100,
