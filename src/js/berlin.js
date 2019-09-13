@@ -28,7 +28,7 @@ const createBuilding = () => ({
 function drawBuilding(ctx, {width, height}) {
     ctx.fillStyle = '#888';
     ctx.fillRect(1, 0, width - 2, -height);
-    for (let y = -height; y < -10; y+= 6) {
+    for (let y = -height; y < -7; y+=8) {
         ctx.fillRect(0, y, width, 1);
     }
 }
