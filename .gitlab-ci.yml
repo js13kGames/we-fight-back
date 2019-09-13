@@ -16,7 +16,7 @@ build:
   script:
   - npm run-script build -- --public-url ./ --no-source-maps --no-content-hash
   - cd dist
-  - zip game *.html *.js *.png
+  - zip -9 game *.html *.js *.png
   - cd -
   - mv dist/game.zip ./
   - echo 'file_size $(stat --printf="%s" game.zip)' > metrics.txt
