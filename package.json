@@ -9,7 +9,7 @@
     },
     "devDependencies": {
         "parcel-bundler": "^1.12.4",
-        "random": "^2.1.1",
+        "random": "^2.2.0",
         "seedrandom": "^3.0.5"
     }
 }
