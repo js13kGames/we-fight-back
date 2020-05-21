@@ -11,7 +11,7 @@ const brandenburgerTorImage = new Image();
 brandenburgerTorImage.src = brandenburgerTorImagePath;
 
 
-function drawTvTower(ctx, meters) {
+function drawTvTower(ctx) {
     ctx.fillStyle = '#aaa';
     let region = new Path2D();
     region.moveTo(4, 0);

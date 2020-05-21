@@ -26,7 +26,6 @@ export function drawText(string, scl, pos, rAlign ) {
         var rAlign = false;
     }
     const context = TCTX;
-    const canvas = TCVS;
     const size = 5 * scl;
     const TX = pos.x;
     const TY = pos.y;

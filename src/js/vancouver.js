@@ -37,12 +37,13 @@ function drawBuilding(ctx, {width, height}) {
     }
 }
 
-function drawStepRoof() {
-    ctx.fillRect(2, 0, width - 2, -height);
-    for (let y = -6; y > height; y-= 6) {
-        ctx.fillRect(0, y, 2, 1);
-    }
-}
+// Unused building
+// function drawStepRoof() {
+//     ctx.fillRect(2, 0, width - 2, -height);
+//     for (let y = -6; y > height; y-= 6) {
+//         ctx.fillRect(0, y, 2, 1);
+//     }
+// }
 
 function drawVancouver(ctx, meters) {
     ctx.save();
