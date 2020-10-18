@@ -32,7 +32,7 @@ The extras for monetized subscribers are a mode where the texts of the story got
 * [Zuper Zmall Zeeded Zound Zynth](https://zzfx.3d2k.com/)
 
 ### Used graphics
-* fossils3 (includes standing t-rex): CC-BY 3.0 https://opengameart.org/content/fossil-undead-rpg-enemy-sprites
+* fossils3 by Stephen Challener (Redshrike), hosted by OpenGameArt.org: CC-BY 3.0 https://opengameart.org/content/fossil-undead-rpg-enemy-sprites
 
 ### Used Software
 The game is written in JavaScript and uses [Parcel](https://parceljs.org/) for building.
