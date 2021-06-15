@@ -135,7 +135,7 @@ function shuffleArray(array) {
     return array;
 }
 
-document.onkeypress = function(evt) {
+document.onkeydown = function(evt) {
     evt = evt || window.event;
     const key = evt.key == 'Spacebar' ? ' ' : evt.key.toLowerCase(); // for some older browsers
     if (currentState == MENU || DEBUG) {
