@@ -5,11 +5,11 @@
     "license": "AGPL-3.0-or-later",
     "scripts": {
         "build": "parcel build src/index.html",
-        "watch": "parcel src/index.html"
+        "start": "parcel src/index.html"
     },
+    "sourceMap": false,
     "devDependencies": {
-        "parcel-bundler": "^1.12.4",
-        "random": "^2.2.0",
-        "seedrandom": "^3.0.5"
+        "@parcel/transformer-image": "^2.0.0-rc.0",
+        "parcel": "^2.0.0-rc.0"
     }
 }

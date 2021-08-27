@@ -2,11 +2,11 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-import vancouverBorderImagePath from '../images/vancouver-border.png';
+import vancouverBorderImagePath from 'url:../images/vancouver-border.png';
 const vancouverBorderImage = new Image();
 vancouverBorderImage.src = vancouverBorderImagePath;
 
-import habourCentreImagePath from '../images/habour-centre.png';
+import habourCentreImagePath from 'url:../images/habour-centre.png';
 const habourCentreImage = new Image();
 habourCentreImage.src = habourCentreImagePath;
 
