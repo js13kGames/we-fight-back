@@ -2,11 +2,11 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-import berlinBorderImagePath from '../images/berlin-border.png';
+import berlinBorderImagePath from 'url:../images/berlin-border.png';
 const berlinBorderImage = new Image();
 berlinBorderImage.src = berlinBorderImagePath;
 
-import brandenburgerTorImagePath from '../images/brandenburger-tor.png';
+import brandenburgerTorImagePath from 'url:../images/brandenburger-tor.png';
 const brandenburgerTorImage = new Image();
 brandenburgerTorImage.src = brandenburgerTorImagePath;
 
