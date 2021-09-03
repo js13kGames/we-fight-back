@@ -3,6 +3,9 @@
     "private": true,
     "version": "1.0.0",
     "license": "AGPL-3.0-or-later",
+    "source": "src/index.html",
+    "browserslist": "firefox 90, chrome 92",
+    "type": "module",
     "scripts": {
         "build": "parcel build src/index.html",
         "start": "parcel src/index.html"
